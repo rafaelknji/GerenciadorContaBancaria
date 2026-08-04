@@ -1,6 +1,6 @@
 package model;
-
 import exception.SaldoInsuficienteException;
+import org.w3c.dom.ls.LSOutput;
 
 public class ContaCorrente extends Conta{
     public ContaCorrente(String titular, int numero, double saldo) {
@@ -14,6 +14,5 @@ public class ContaCorrente extends Conta{
         }
         setSaldo(getSaldo() - valor);
     }
-
 
 }
