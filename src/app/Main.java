@@ -1,3 +1,5 @@
+package app;
+
 import exception.SaldoInsuficienteException;
 import model.ContaCorrente;
 import java.io.BufferedReader;

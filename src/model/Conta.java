@@ -40,7 +40,10 @@ public abstract class Conta {
     public abstract void sacar(double valor) throws SaldoInsuficienteException;
 
     public void depositar(double valor){
-        this.saldo += valor;
+        if(valor > 0){
+            this.saldo += valor;
+        }
+
     }
 
     public void imprimirDados(){
