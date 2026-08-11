@@ -12,6 +12,20 @@ public abstract class Conta {
         this.saldo = saldo;
     }
 
+    public abstract void sacar(double valor) throws SaldoInsuficienteException;
+
+    public void depositar(double valor){
+        if(valor > 0){
+            this.saldo += valor;
+        }
+    }
+
+    public void imprimirDados(){
+        System.out.println("Numero da conta: " + this.numero);
+        System.out.println("Titular: " + this.titular);
+        System.out.println("Saldo: R$" + this.saldo);
+    }
+
     public int getNumero() {
         return numero;
     }
@@ -35,24 +49,6 @@ public abstract class Conta {
     public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
-
-
-    public abstract void sacar(double valor) throws SaldoInsuficienteException;
-
-    public void depositar(double valor){
-        if(valor > 0){
-            this.saldo += valor;
-        }
-
-    }
-
-    public void imprimirDados(){
-        System.out.println("Numero da conta: " + this.numero);
-        System.out.println("Titular: " + this.titular);
-        System.out.println("Saldo: " + this.saldo);
-    }
-
-
 
 
 }
