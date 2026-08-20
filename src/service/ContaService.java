@@ -7,13 +7,15 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ContaService {
 
-    private List<ContaCorrente> contas = new ArrayList<>();
-
-
     public List<ContaCorrente> lerContas(String caminho) throws IOException {
+
+        List<ContaCorrente> contas = new ArrayList<>();
+
         List<String> linhas = Files.readAllLines(Paths.get(caminho));
 
         for(String linha : linhas){
@@ -28,10 +30,6 @@ public class ContaService {
         return contas;
     }
 
-    public void sacarValor(ContaCorrente conta, double valor) throws SaldoInsuficienteException {
-        conta.sacar(valor);
-    }
-
     public void atualizarConta(List<ContaCorrente> contas, String caminho) throws IOException{
         List<String> linhas = new ArrayList<>();
 
@@ -42,6 +40,28 @@ public class ContaService {
         }
 
         Files.write(Paths.get(caminho), linhas);
+    }
+
+    public List<ContaCorrente> filtrarSaldoMaior10000(List<ContaCorrente> contas) {
+        return contas.stream().filter(conta -> conta.getSaldo() > 10000).toList();
+    }
+
+    public double calcularSaldoTotal(List<ContaCorrente> contas) {
+        return contas.stream().map(ContaCorrente::getSaldo).reduce(0.0, Double::sum);
+    }
+
+    public Map<String, List<ContaCorrente>> agruparSaldo(List<ContaCorrente> contas) {
+        return contas.stream().collect(Collectors.groupingBy(conta -> {
+            double saldo = conta.getSaldo();
+
+            if(saldo <=5000) {
+                return "Até R$ 5.000"
+            } else if (saldo <= 10000) {
+                return "R$ 5.000 a R$ 10.000"
+            } else {
+                return "Acima de R$ 10.000"
+            }
+        }));
     }
 }
 

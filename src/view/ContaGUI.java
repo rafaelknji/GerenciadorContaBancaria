@@ -51,6 +51,7 @@ public class ContaGUI extends JFrame {
         setLocationRelativeTo(null);
     }
 
+
     private void criarInterface() {
 
         setLayout(new BorderLayout());
@@ -168,11 +169,10 @@ public class ContaGUI extends JFrame {
 
             double valor = Double.parseDouble(txtValor.getText());
 
-            contaService.sacarValor(conta, valor);
+            conta.sacar(valor);
 
             JOptionPane.showMessageDialog(
-                    this,
-                    "Saque realizado com sucesso!"
+                    this, "Saque realizado com sucesso!"
             );
 
             atualizarTela();
@@ -180,19 +180,13 @@ public class ContaGUI extends JFrame {
         } catch (NumberFormatException e) {
 
             JOptionPane.showMessageDialog(
-                    this,
-                    "Digite um valor válido.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
+                    this, "Digite um valor válido.", "Erro", JOptionPane.ERROR_MESSAGE
             );
 
         } catch (SaldoInsuficienteException e) {
 
             JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage(),
-                    "Saque não realizado!",
-                    JOptionPane.ERROR_MESSAGE
+                    this, e.getMessage(), "Saque não realizado!", JOptionPane.ERROR_MESSAGE
             );
         }
     }
@@ -203,10 +197,7 @@ public class ContaGUI extends JFrame {
 
         if (conta == null) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Selecione uma conta.",
-                    "Aviso",
-                    JOptionPane.WARNING_MESSAGE
+                    this, "Selecione uma conta.", "Aviso", JOptionPane.WARNING_MESSAGE
             );
             return;
         }
@@ -227,20 +218,14 @@ public class ContaGUI extends JFrame {
 
             conta.depositar(valor);
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Depósito realizado com sucesso!"
-            );
+            JOptionPane.showMessageDialog(this, "Depósito realizado com sucesso!");
 
             atualizarTela();
 
         } catch (NumberFormatException e) {
 
             JOptionPane.showMessageDialog(
-                    this,
-                    "Digite um valor válido.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
+                    this, "Digite um valor válido.", "Erro", JOptionPane.ERROR_MESSAGE
             );
         }
     }
@@ -255,10 +240,7 @@ public class ContaGUI extends JFrame {
         } catch (IOException e) {
 
             JOptionPane.showMessageDialog(
-                    this,
-                    "Erro ao salvar contas: " + e.getMessage(),
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
+                    this, "Erro ao salvar contas: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE
             );
         }
     }
