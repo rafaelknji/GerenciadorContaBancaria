@@ -25,6 +25,10 @@ public class ContaGUI extends JFrame {
 
     private JButton btnSacar;
     private JButton btnDepositar;
+    private JButton btnFiltrar;
+    private JButton btnAgrupar;
+    private JButton btnSaldoTotal;
+
 
     public ContaGUI() {
 
@@ -82,16 +86,21 @@ public class ContaGUI extends JFrame {
 
         // Operações
         JPanel painelOperacoes = new JPanel();
+        JPanel painelFiltros = new JPanel();
 
         txtValor = new JTextField(10);
 
         btnSacar = new JButton("Sacar");
         btnDepositar = new JButton("Depositar");
+        btnFiltrar = new JButton("Filtrar");
+        btnAgrupar = new JButton("Agrupar");
+        btnSaldoTotal = new JButton("Saldo total");
 
         painelOperacoes.add(new JLabel("Valor:"));
         painelOperacoes.add(txtValor);
         painelOperacoes.add(btnSacar);
         painelOperacoes.add(btnDepositar);
+        painelFiltros.add(btnFiltrar);
 
         add(painelOperacoes, BorderLayout.SOUTH);
 
@@ -109,6 +118,9 @@ public class ContaGUI extends JFrame {
 
         // Botão depositar
         btnDepositar.addActionListener(e -> depositar());
+
+        // Botao filtrar
+        btnFiltrar.addActionListener(e -> filtrarSaldoMaior10000());
     }
 
     private void carregarLista() {
@@ -165,25 +177,18 @@ public class ContaGUI extends JFrame {
         }
 
         try {
-
             double valor = Double.parseDouble(txtValor.getText());
-
             conta.sacar(valor);
-
-            JOptionPane.showMessageDialog(
-                    this, "Saque realizado com sucesso!"
-            );
+            JOptionPane.showMessageDialog(this, "Saque realizado com sucesso!");
 
             atualizarTela();
 
         } catch (NumberFormatException e) {
-
             JOptionPane.showMessageDialog(
                     this, "Digite um valor válido.", "Erro", JOptionPane.ERROR_MESSAGE
             );
 
         } catch (SaldoInsuficienteException e) {
-
             JOptionPane.showMessageDialog(
                     this, e.getMessage(), "Saque não realizado!", JOptionPane.ERROR_MESSAGE
             );
@@ -191,20 +196,15 @@ public class ContaGUI extends JFrame {
     }
 
     private void depositar() {
-
         ContaCorrente conta = getContaSelecionada();
-
         if (conta == null) {
             JOptionPane.showMessageDialog(
-                    this, "Selecione uma conta.", "Aviso", JOptionPane.WARNING_MESSAGE
-            );
+                    this, "Selecione uma conta.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         try {
-
             double valor = Double.parseDouble(txtValor.getText());
-
             if (valor <= 0) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -216,17 +216,30 @@ public class ContaGUI extends JFrame {
             }
 
             conta.depositar(valor);
-
             JOptionPane.showMessageDialog(this, "Depósito realizado com sucesso!");
-
             atualizarTela();
 
         } catch (NumberFormatException e) {
-
             JOptionPane.showMessageDialog(
                     this, "Digite um valor válido.", "Erro", JOptionPane.ERROR_MESSAGE
             );
         }
+    }
+
+    private void filtrarSaldoMaior10000() {
+        List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior10000(contas);
+
+        String resultado = "";
+
+        for (ContaCorrente conta : contasFiltradas) {
+           resultado += "Numero: " + conta.getNumero() + " - Titular: " + conta.getTitular() + " - R$: " + conta.getSaldo() + "\n";
+        }
+
+        JOptionPane.showMessageDialog(
+                this,
+                resultado,
+                "Contas com saldo acima de R$ 10.000",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void atualizarTela() {
