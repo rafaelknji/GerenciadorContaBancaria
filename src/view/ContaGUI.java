@@ -25,9 +25,8 @@ public class ContaGUI extends JFrame {
 
     private JButton btnSacar;
     private JButton btnDepositar;
-    private JButton btnFiltrar;
-    private JButton btnAgrupar;
-    private JButton btnSaldoTotal;
+
+    private JButton btnFiltros;
 
 
     public ContaGUI() {
@@ -57,7 +56,6 @@ public class ContaGUI extends JFrame {
 
 
     private void criarInterface() {
-
         setLayout(new BorderLayout());
 
         // Lista das contas
@@ -86,21 +84,33 @@ public class ContaGUI extends JFrame {
 
         // Operações
         JPanel painelOperacoes = new JPanel();
-        JPanel painelFiltros = new JPanel();
 
         txtValor = new JTextField(10);
 
         btnSacar = new JButton("Sacar");
         btnDepositar = new JButton("Depositar");
-        btnFiltrar = new JButton("Filtrar");
-        btnAgrupar = new JButton("Agrupar");
-        btnSaldoTotal = new JButton("Saldo total");
+        btnFiltros = new JButton("Filtros");
+
+
+        //menu de filtros gerais
+        JPopupMenu menuFiltros = new JPopupMenu();
+
+        JMenuItem itemFiltrar = new JMenuItem("Saldo > R$ 10K");
+        JMenuItem itemSaldoTotal = new JMenuItem("Saldo Total");
+        JMenuItem itemAgrupar = new JMenuItem("Agrupar por Saldo");
+
+        menuFiltros.add(itemFiltrar);
+        menuFiltros.add(itemSaldoTotal);
+        menuFiltros.add(itemAgrupar);
+
+        btnFiltros.addActionListener(e -> menuFiltros.show(btnFiltros, 0, btnFiltros.getHeight()));
+
 
         painelOperacoes.add(new JLabel("Valor:"));
         painelOperacoes.add(txtValor);
         painelOperacoes.add(btnSacar);
         painelOperacoes.add(btnDepositar);
-        painelFiltros.add(btnFiltrar);
+        painelOperacoes.add(btnFiltros);
 
         add(painelOperacoes, BorderLayout.SOUTH);
 
@@ -119,8 +129,6 @@ public class ContaGUI extends JFrame {
         // Botão depositar
         btnDepositar.addActionListener(e -> depositar());
 
-        // Botao filtrar
-        btnFiltrar.addActionListener(e -> filtrarSaldoMaior10000());
     }
 
     private void carregarLista() {
