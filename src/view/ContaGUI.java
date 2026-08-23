@@ -68,7 +68,7 @@ public class ContaGUI extends JFrame {
 
         // Informações da conta selecionada
         JPanel painelDados = new JPanel();
-        painelDados.setLayout(new GridLayout(3, 1));
+        painelDados.setLayout(new GridLayout(1, 3, 30, 10));
 
         lblNumero = new JLabel("Número: ");
         lblTitular = new JLabel("Titular: ");
@@ -118,11 +118,10 @@ public class ContaGUI extends JFrame {
         for (ContaCorrente conta : contas) {
 
             modeloLista.addElement(
-                    conta.getNumero()
-                            + " - "
-                            + conta.getTitular()
-                            + " - R$ "
-                            + conta.getSaldo()
+                    String.format(
+                            "%-49s %-52s R$ %.2f",
+                            conta.getNumero(), conta.getTitular(), conta.getSaldo()
+                    )
             );
         }
     }

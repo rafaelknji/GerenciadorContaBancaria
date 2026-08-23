@@ -55,11 +55,11 @@ public class ContaService {
             double saldo = conta.getSaldo();
 
             if(saldo <=5000) {
-                return "Até R$ 5.000"
+                return "Até R$ 5.000";
             } else if (saldo <= 10000) {
-                return "R$ 5.000 a R$ 10.000"
+                return "R$ 5.000 a R$ 10.000";
             } else {
-                return "Acima de R$ 10.000"
+                return "Acima de R$ 10.000";
             }
         }));
     }
