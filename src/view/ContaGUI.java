@@ -20,13 +20,15 @@ public class ContaGUI extends JFrame {
     private JLabel lblNumero;
     private JLabel lblTitular;
     private JLabel lblSaldo;
+    private JLabel lblSaldoTotal;
+    private JLabel lblResultadoSaldoTotal;
 
     private JTextField txtValor;
 
     private JButton btnSacar;
     private JButton btnDepositar;
-
     private JButton btnFiltros;
+    private JButton btnAgrupar;
 
 
     public ContaGUI() {
@@ -47,6 +49,7 @@ public class ContaGUI extends JFrame {
 
         criarInterface();
         carregarLista();
+        atualizarSaldoTotal();
 
         setTitle("Gerenciador de Contas Bancárias");
         setSize(500, 400);
@@ -82,6 +85,20 @@ public class ContaGUI extends JFrame {
 
         add(painelDados, BorderLayout.NORTH);
 
+        //Painel Total Saldo
+        JPanel painelSaldoTotal = new JPanel();
+        painelSaldoTotal.setLayout(new BorderLayout());
+
+        lblSaldoTotal = new JLabel("Saldo Total:");
+        lblResultadoSaldoTotal = new JLabel("00,00");
+
+        painelSaldoTotal.add(lblSaldoTotal, BorderLayout.WEST);
+        painelSaldoTotal.add(lblResultadoSaldoTotal, BorderLayout.EAST);
+
+        painelSaldoTotal.setBorder(
+                BorderFactory.createEmptyBorder(0, 5, 0, 10)
+        );
+
         // Operações
         JPanel painelOperacoes = new JPanel();
 
@@ -90,29 +107,41 @@ public class ContaGUI extends JFrame {
         btnSacar = new JButton("Sacar");
         btnDepositar = new JButton("Depositar");
         btnFiltros = new JButton("Filtros");
-
-
-        //menu de filtros gerais
-        JPopupMenu menuFiltros = new JPopupMenu();
-
-        JMenuItem itemFiltrar = new JMenuItem("Saldo > R$ 10K");
-        JMenuItem itemSaldoTotal = new JMenuItem("Saldo Total");
-        JMenuItem itemAgrupar = new JMenuItem("Agrupar por Saldo");
-
-        menuFiltros.add(itemFiltrar);
-        menuFiltros.add(itemSaldoTotal);
-        menuFiltros.add(itemAgrupar);
-
-        btnFiltros.addActionListener(e -> menuFiltros.show(btnFiltros, 0, btnFiltros.getHeight()));
-
+        btnAgrupar = new JButton("Agrupar");
 
         painelOperacoes.add(new JLabel("Valor:"));
         painelOperacoes.add(txtValor);
         painelOperacoes.add(btnSacar);
         painelOperacoes.add(btnDepositar);
         painelOperacoes.add(btnFiltros);
+        painelOperacoes.add(btnAgrupar);
 
-        add(painelOperacoes, BorderLayout.SOUTH);
+        JPanel painelInferior = new JPanel();
+        painelInferior.setLayout(new GridLayout(2, 1));
+        painelInferior.add(painelSaldoTotal);
+        painelInferior.add(painelOperacoes);
+        add(painelInferior, BorderLayout.SOUTH);
+
+
+        //menu de filtros gerais
+        JPopupMenu menuFiltros = new JPopupMenu();
+
+        JMenuItem itemFiltrar = new JMenuItem("Saldo > R$ 10K");
+        itemFiltrar.addActionListener(e -> filtrarSaldoMaior10000());
+
+        JMenuItem itemLimparFiltro = new JMenuItem("Limpar filtros");
+        itemLimparFiltro.addActionListener(e -> {
+            carregarLista();
+            atualizarSaldoTotal();
+        });
+
+        menuFiltros.add(itemFiltrar);
+        menuFiltros.add(itemLimparFiltro);
+
+        btnFiltros.addActionListener(e -> menuFiltros.show(btnFiltros, 0, btnFiltros.getHeight()));
+
+
+
 
         // Quando selecionar uma conta
         listaContas.addListSelectionListener(e -> {
@@ -128,7 +157,6 @@ public class ContaGUI extends JFrame {
 
         // Botão depositar
         btnDepositar.addActionListener(e -> depositar());
-
     }
 
     private void carregarLista() {
@@ -136,7 +164,6 @@ public class ContaGUI extends JFrame {
         modeloLista.clear();
 
         for (ContaCorrente conta : contas) {
-
             modeloLista.addElement(
                     String.format(
                             "%-49s %-52s R$ %.2f",
@@ -235,25 +262,36 @@ public class ContaGUI extends JFrame {
     }
 
     private void filtrarSaldoMaior10000() {
-        List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior10000(contas);
+        List<ContaCorrente> contasFiltradas =
+                contaService.filtrarSaldoMaior10000(contas);
 
-        String resultado = "";
+        modeloLista.clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-           resultado += "Numero: " + conta.getNumero() + " - Titular: " + conta.getTitular() + " - R$: " + conta.getSaldo() + "\n";
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f",
+                    conta.getNumero(), conta.getTitular(), conta.getSaldo()
+            ));
         }
 
-        JOptionPane.showMessageDialog(
-                this,
-                resultado,
-                "Contas com saldo acima de R$ 10.000",
-                JOptionPane.INFORMATION_MESSAGE);
+        double saldoTotal = contaService.calcularSaldoTotal(contasFiltradas);
+
+        lblResultadoSaldoTotal.setText(String.format("R$ %.2f", saldoTotal));
+    }
+
+    private void atualizarSaldoTotal() {
+        double saldoTotal = contaService.calcularSaldoTotal(contas);
+
+        lblResultadoSaldoTotal.setText(
+                String.format("R$ %.2f", saldoTotal)
+        );
     }
 
     private void atualizarTela() {
 
         carregarLista();
         mostrarContaSelecionada();
+        atualizarSaldoTotal();
 
         try {
             contaService.atualizarConta(contas, "contas_atualizadas.txt");
