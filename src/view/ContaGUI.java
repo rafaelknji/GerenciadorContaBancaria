@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class ContaGUI extends JFrame {
 
@@ -145,12 +146,18 @@ public class ContaGUI extends JFrame {
         JPopupMenu AgruparSaldo = new JPopupMenu();
 
         JMenuItem itemAte5000 = new JMenuItem("Até R$ 5.000");
+        itemAte5000.addActionListener(e -> agruparSaldo("Até R$ 5.000"));
+
         JMenuItem itemAte10000 = new JMenuItem("de R$ 5.000 a R$ 10.000");
+        itemAte10000.addActionListener(e -> agruparSaldo("R$ 5.000 a R$ 10.000"));
+
         JMenuItem itemMaior10000 = new JMenuItem("Acima R$ 10.000");
+        itemMaior10000.addActionListener(e -> agruparSaldo("Acima de R$ 10.000"));
 
         AgruparSaldo.add(itemAte5000);
         AgruparSaldo.add(itemAte10000);
         AgruparSaldo.add(itemMaior10000);
+
         btnAgrupar.addActionListener(e -> AgruparSaldo.show(btnAgrupar, 0, btnAgrupar.getHeight()));
 
 
@@ -287,6 +294,34 @@ public class ContaGUI extends JFrame {
         }
 
         double saldoTotal = contaService.calcularSaldoTotal(contasFiltradas);
+
+        lblResultadoSaldoTotal.setText(String.format("R$ %.2f", saldoTotal));
+    }
+
+    private void agruparSaldo(String categoria) {
+        Map<String, List<ContaCorrente>> grupos = contaService.agruparSaldo(contas);
+
+        List<ContaCorrente> contasAgrupadas = grupos.get(categoria);
+
+        modeloLista.clear();
+
+        if (contasAgrupadas == null || contasAgrupadas.isEmpty()) {
+            lblResultadoSaldoTotal.setText("R$ 0,00");
+            return;
+        }
+
+        for (ContaCorrente conta : contasAgrupadas) {
+            modeloLista.addElement(
+                    String.format(
+                            "%-49s %-52s R$ %.2f",
+                            conta.getNumero(),
+                            conta.getTitular(),
+                            conta.getSaldo()
+                    )
+            );
+        }
+
+        double saldoTotal = contaService.calcularSaldoTotal(contasAgrupadas);
 
         lblResultadoSaldoTotal.setText(String.format("R$ %.2f", saldoTotal));
     }
