@@ -141,6 +141,18 @@ public class ContaGUI extends JFrame {
         btnFiltros.addActionListener(e -> menuFiltros.show(btnFiltros, 0, btnFiltros.getHeight()));
 
 
+        // Agrupar por saldo
+        JPopupMenu AgruparSaldo = new JPopupMenu();
+
+        JMenuItem itemAte5000 = new JMenuItem("Até R$ 5.000");
+        JMenuItem itemAte10000 = new JMenuItem("de R$ 5.000 a R$ 10.000");
+        JMenuItem itemMaior10000 = new JMenuItem("Acima R$ 10.000");
+
+        AgruparSaldo.add(itemAte5000);
+        AgruparSaldo.add(itemAte10000);
+        AgruparSaldo.add(itemMaior10000);
+        btnAgrupar.addActionListener(e -> AgruparSaldo.show(btnAgrupar, 0, btnAgrupar.getHeight()));
+
 
 
         // Quando selecionar uma conta
