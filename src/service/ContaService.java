@@ -8,6 +8,7 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ContaService {
@@ -63,5 +64,23 @@ public class ContaService {
             }
         }));
     }
+
+    public List<ContaCorrente> filtrarSaldoMaior5k (List<ContaCorrente> contas) {
+        Predicate<ContaCorrente> saldoMaior5k = c -> c.getSaldo() > 5000;
+        List<ContaCorrente> resultado = contas.stream()
+                .filter(saldoMaior5k)
+                .collect((Collectors.toList()));
+        return resultado;
+    }
+
+    public List<ContaCorrente> filtrarContaPar (List<ContaCorrente> contas) {
+        Predicate<ContaCorrente> contasPar = c -> c.getNumero() % 2==0;
+        List<ContaCorrente> resultado = contas.stream().filter(contasPar).collect(Collectors.toList());
+
+        return resultado;
+    }
+
+
+
 }
 
