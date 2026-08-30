@@ -14,18 +14,18 @@ public class Main {
         gui.setVisible(true);
 
 
-        /*
-        ContaService contaService = new ContaService();
+
+        /*ContaService contaService = new ContaService();
 
         List<ContaCorrente> contas = contaService.lerContas("conta.txt");
 
         List<ContaCorrente> resultado =
-                contaService.filtrarContaPar(contas);
+                contaService.ordenarSaldoDecrescente(contas);
 
         for (ContaCorrente conta : resultado) {
             System.out.println(
                     conta.getNumero() + " - " + conta.getTitular() + " - " + conta.getSaldo());
-        }
-        */
+        }*/
+
     }
 }

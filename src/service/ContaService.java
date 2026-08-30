@@ -6,6 +6,7 @@ import model.ContaCorrente;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -75,10 +76,49 @@ public class ContaService {
 
     public List<ContaCorrente> filtrarContaPar (List<ContaCorrente> contas) {
         Predicate<ContaCorrente> contasPar = c -> c.getNumero() % 2==0;
-        List<ContaCorrente> resultado = contas.stream().filter(contasPar).collect(Collectors.toList());
-
+        List<ContaCorrente> resultado = contas.stream()
+                .filter(contasPar)
+                .collect(Collectors.toList());
         return resultado;
     }
+
+    // Ordenacao
+
+    public List<ContaCorrente> ordenarSaldoDecrescente (List<ContaCorrente> contas) {
+        Comparator<ContaCorrente> porSaldoDecrescente = (c1, c2) ->
+                Double.compare(c2.getSaldo(), c1.getSaldo());
+         contas.sort(porSaldoDecrescente);
+
+         return contas;
+    }
+
+    public List<ContaCorrente> ordenarSaldoCrescente (List<ContaCorrente> contas) {
+        Comparator<ContaCorrente> porSaldoCrescente = (c1, c2) ->
+                Double.compare(c1.getSaldo(), c2.getSaldo());
+        contas.sort(porSaldoCrescente);
+
+        return contas;
+    }
+
+    public List<ContaCorrente> ordenarAlfabeticaAZ (List<ContaCorrente> contas) {
+        Comparator<ContaCorrente> porTitular = (c1, c2) ->
+                c1.getTitular().compareTo(c2.getTitular());
+        contas.sort(porTitular);
+
+        return contas;
+    }
+
+    public List<ContaCorrente> ordenarAlfabeticaZA (List<ContaCorrente> contas) {
+        Comparator<ContaCorrente> porTitular = (c1, c2) ->
+                c1.getTitular().compareTo(c2.getTitular());
+        contas.sort(porTitular);
+
+        return contas;
+    }
+
+
+
+
 
 
 
