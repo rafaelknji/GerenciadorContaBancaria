@@ -127,8 +127,11 @@ public class ContaGUI extends JFrame {
         //menu de filtros gerais
         JPopupMenu menuFiltros = new JPopupMenu();
 
-        JMenuItem itemFiltrar = new JMenuItem("Saldo > R$ 10K");
-        itemFiltrar.addActionListener(e -> filtrarSaldoMaior10000());
+        JMenuItem itemFiltrar5k = new JMenuItem("Saldo > 5K");
+        itemFiltrar5k.addActionListener(e -> filtrarSaldoMaior5k());
+
+        JMenuItem itemFiltrar10k = new JMenuItem("Saldo > R$ 10K");
+        itemFiltrar10k.addActionListener(e -> filtrarSaldoMaior10000());
 
         JMenuItem itemLimparFiltro = new JMenuItem("Limpar filtros");
         itemLimparFiltro.addActionListener(e -> {
@@ -136,7 +139,8 @@ public class ContaGUI extends JFrame {
             atualizarSaldoTotal();
         });
 
-        menuFiltros.add(itemFiltrar);
+        menuFiltros.add(itemFiltrar5k);
+        menuFiltros.add(itemFiltrar10k);
         menuFiltros.add(itemLimparFiltro);
 
         btnFiltros.addActionListener(e -> menuFiltros.show(btnFiltros, 0, btnFiltros.getHeight()));
@@ -347,6 +351,21 @@ public class ContaGUI extends JFrame {
             JOptionPane.showMessageDialog(
                     this, "Erro ao salvar contas: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE
             );
+        }
+    }
+
+    private void filtrarSaldoMaior5k() {
+        List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(contas);
+
+        modeloLista.clear();
+
+        for (ContaCorrente conta : contasFiltradas) {
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f",
+                    conta.getNumero(),
+                    conta.getTitular(),
+                    conta.getSaldo()
+            ));
         }
     }
 }
