@@ -30,6 +30,7 @@ public class ContaGUI extends JFrame {
     private JButton btnDepositar;
     private JButton btnFiltros;
     private JButton btnAgrupar;
+    private JButton btnOrdenar;
 
 
     public ContaGUI() {
@@ -53,7 +54,7 @@ public class ContaGUI extends JFrame {
         atualizarSaldoTotal();
 
         setTitle("Gerenciador de Contas Bancárias");
-        setSize(500, 400);
+        setSize(650, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }
@@ -74,15 +75,30 @@ public class ContaGUI extends JFrame {
 
         // Informações da conta selecionada
         JPanel painelDados = new JPanel();
-        painelDados.setLayout(new GridLayout(1, 3, 30, 10));
+        painelDados.setLayout(new GridLayout(1, 4, 30, 10));
 
         lblNumero = new JLabel("Número: ");
         lblTitular = new JLabel("Titular: ");
         lblSaldo = new JLabel("Saldo: ");
+        btnOrdenar = new JButton("Ordenar");
 
         painelDados.add(lblNumero);
         painelDados.add(lblTitular);
         painelDados.add(lblSaldo);
+        painelDados.add(btnOrdenar);
+
+
+        JPopupMenu menuOrdem = new JPopupMenu();
+        JMenuItem itemCrescente = new JMenuItem("Crescente(0-9)");
+        JMenuItem itemDecrescente = new JMenuItem("Decrescente(9-0");
+        JMenuItem itemAlfabeticaAZ = new JMenuItem("Alfabetica(A-Z)");
+        JMenuItem itemAlfabeticaZA = new JMenuItem("Alfabetica(Z-A)");
+        menuOrdem.add(itemCrescente);
+        menuOrdem.add(itemDecrescente);
+        menuOrdem.add(itemAlfabeticaAZ);
+        menuOrdem.add(itemAlfabeticaZA);
+        btnOrdenar.addActionListener(e -> menuOrdem.show(btnFiltros, 0, btnFiltros.getHeight()));
+
 
         add(painelDados, BorderLayout.NORTH);
 
