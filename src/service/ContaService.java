@@ -111,7 +111,7 @@ public class ContaService {
 
     public List<ContaCorrente> ordenarAlfabeticaZA (List<ContaCorrente> contas) {
         Comparator<ContaCorrente> porTitular = (c1, c2) ->
-                c1.getTitular().compareTo(c2.getTitular());
+                c2.getTitular().compareTo(c1.getTitular());
         contas.sort(porTitular);
 
         return contas;
