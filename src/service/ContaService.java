@@ -101,7 +101,7 @@ public class ContaService {
         return contas;
     }
 
-    public List<ContaCorrente> ordenarAlfabeticaAZ (List<ContaCorrente> contas) {
+    public List<ContaCorrente> ordemAlfabeticaAZ (List<ContaCorrente> contas) {
         Comparator<ContaCorrente> porTitular = (c1, c2) ->
                 c1.getTitular().compareTo(c2.getTitular());
         contas.sort(porTitular);
@@ -109,7 +109,7 @@ public class ContaService {
         return contas;
     }
 
-    public List<ContaCorrente> ordenarAlfabeticaZA (List<ContaCorrente> contas) {
+    public List<ContaCorrente> ordemAlfabeticaZA (List<ContaCorrente> contas) {
         Comparator<ContaCorrente> porTitular = (c1, c2) ->
                 c2.getTitular().compareTo(c1.getTitular());
         contas.sort(porTitular);

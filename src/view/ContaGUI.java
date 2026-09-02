@@ -73,7 +73,7 @@ public class ContaGUI extends JFrame {
 
         add(scrollPane, BorderLayout.CENTER);
 
-        // Informações da conta selecionada
+        // Painel Informações da conta selecionada
         JPanel painelDados = new JPanel();
         painelDados.setLayout(new GridLayout(1, 4, 30, 10));
 
@@ -87,22 +87,30 @@ public class ContaGUI extends JFrame {
         painelDados.add(lblSaldo);
         painelDados.add(btnOrdenar);
 
-
         JPopupMenu menuOrdem = new JPopupMenu();
+
         JMenuItem itemCrescente = new JMenuItem("Crescente(0-9)");
+        itemCrescente.addActionListener(e -> ordenarSaldoCrescente());
+
         JMenuItem itemDecrescente = new JMenuItem("Decrescente(9-0");
-        JMenuItem itemAlfabeticaAZ = new JMenuItem("Alfabetica(A-Z)");
-        JMenuItem itemAlfabeticaZA = new JMenuItem("Alfabetica(Z-A)");
+        itemDecrescente.addActionListener(e -> ordenarSaldoDecrescente());
+
+        JMenuItem itemAlfabeticaAZ = new JMenuItem("Titular(A-Z)");
+        itemAlfabeticaAZ.addActionListener(e -> ordemAlfabeticaAZ());
+
+        JMenuItem itemAlfabeticaZA = new JMenuItem("Titular(Z-A)");
+        itemAlfabeticaZA.addActionListener(e -> ordemAlfabeticaZA());
+
         menuOrdem.add(itemCrescente);
         menuOrdem.add(itemDecrescente);
         menuOrdem.add(itemAlfabeticaAZ);
         menuOrdem.add(itemAlfabeticaZA);
-        btnOrdenar.addActionListener(e -> menuOrdem.show(btnFiltros, 0, btnFiltros.getHeight()));
+        btnOrdenar.addActionListener(e -> menuOrdem.show(btnOrdenar, 0, btnOrdenar.getHeight()));
 
 
         add(painelDados, BorderLayout.NORTH);
 
-        //Painel Total Saldo
+        // Painel Saldo total
         JPanel painelSaldoTotal = new JPanel();
         painelSaldoTotal.setLayout(new BorderLayout());
 
@@ -308,8 +316,7 @@ public class ContaGUI extends JFrame {
 
         for (ContaCorrente conta : contasFiltradas) {
             modeloLista.addElement(String.format(
-                    "%-49s %-52s R$ %.2f",
-                    conta.getNumero(), conta.getTitular(), conta.getSaldo()
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
 
@@ -333,10 +340,7 @@ public class ContaGUI extends JFrame {
         for (ContaCorrente conta : contasAgrupadas) {
             modeloLista.addElement(
                     String.format(
-                            "%-49s %-52s R$ %.2f",
-                            conta.getNumero(),
-                            conta.getTitular(),
-                            conta.getSaldo()
+                            "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
                     )
             );
         }
@@ -377,12 +381,71 @@ public class ContaGUI extends JFrame {
 
         for (ContaCorrente conta : contasFiltradas) {
             modeloLista.addElement(String.format(
-                    "%-49s %-52s R$ %.2f",
-                    conta.getNumero(),
-                    conta.getTitular(),
-                    conta.getSaldo()
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
     }
+
+    private void filtrarContaPar() {
+        List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(contas);
+
+        modeloLista.clear();
+
+        for (ContaCorrente conta : contasFiltradas) {
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
+            ));
+        }
+    }
+
+    private void ordenarSaldoDecrescente() {
+        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(contas);
+
+        modeloLista.clear();
+
+        for (ContaCorrente conta : contasFiltradas) {
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
+            ));
+        }
+    }
+
+    private void ordenarSaldoCrescente() {
+        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(contas);
+
+        modeloLista.clear();
+
+        for (ContaCorrente conta : contasFiltradas) {
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
+            ));
+        }
+    }
+
+    private void ordemAlfabeticaAZ() {
+        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(contas);
+
+        modeloLista.clear();
+
+        for (ContaCorrente conta : contasFiltradas) {
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
+            ));
+        }
+    }
+
+    private void ordemAlfabeticaZA() {
+        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(contas);
+
+        modeloLista.clear();
+
+        for (ContaCorrente conta : contasFiltradas) {
+            modeloLista.addElement(String.format(
+                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
+            ));
+        }
+    }
+
 }
+
 

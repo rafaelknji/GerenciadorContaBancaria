@@ -19,8 +19,7 @@ public class Main {
 
         List<ContaCorrente> contas = contaService.lerContas("conta.txt");
 
-        List<ContaCorrente> resultado =
-                contaService.ordenarSaldoDecrescente(contas);
+        List<ContaCorrente> resultado = contaService.ordenarSaldoDecrescente(contas);
 
         for (ContaCorrente conta : resultado) {
             System.out.println(
