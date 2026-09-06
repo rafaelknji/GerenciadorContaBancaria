@@ -15,8 +15,7 @@ public class ContaGUI extends JFrame {
     private List<ContaCorrente> contas;
     private ContaService contaService;
 
-    private JList<String> listaContas;
-    private DefaultListModel<String> modeloLista;
+    private PainelListaContas painelLista;
 
     private JLabel lblNumero;
     private JLabel lblTitular;
@@ -64,14 +63,8 @@ public class ContaGUI extends JFrame {
         setLayout(new BorderLayout());
 
         // Lista das contas
-        modeloLista = new DefaultListModel<>();
-        listaContas = new JList<>(modeloLista);
-
-        listaContas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        JScrollPane scrollPane = new JScrollPane(listaContas);
-
-        add(scrollPane, BorderLayout.CENTER);
+        painelLista = new PainelListaContas();
+        add(painelLista, BorderLayout.CENTER);
 
         // Painel Informações da conta selecionada
         JPanel painelDados = new JPanel();
@@ -191,7 +184,7 @@ public class ContaGUI extends JFrame {
 
 
         // Quando selecionar uma conta
-        listaContas.addListSelectionListener(e -> {
+        painelLista.getListaContas().addListSelectionListener(e -> {
 
             if (!e.getValueIsAdjusting()) {
                 mostrarContaSelecionada();
@@ -208,10 +201,10 @@ public class ContaGUI extends JFrame {
 
     private void carregarLista() {
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contas) {
-            modeloLista.addElement(
+            painelLista.getModeloLista().addElement(
                     String.format(
                             "%-49s %-52s R$ %.2f",
                             conta.getNumero(), conta.getTitular(), conta.getSaldo()
@@ -222,7 +215,7 @@ public class ContaGUI extends JFrame {
 
     private ContaCorrente getContaSelecionada() {
 
-        int indice = listaContas.getSelectedIndex();
+        int indice = painelLista.getListaContas().getSelectedIndex();;
 
         if (indice == -1) {
             return null;
@@ -312,10 +305,10 @@ public class ContaGUI extends JFrame {
         List<ContaCorrente> contasFiltradas =
                 contaService.filtrarSaldoMaior10000(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
@@ -330,7 +323,7 @@ public class ContaGUI extends JFrame {
 
         List<ContaCorrente> contasAgrupadas = grupos.get(categoria);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         if (contasAgrupadas == null || contasAgrupadas.isEmpty()) {
             lblResultadoSaldoTotal.setText("R$ 0,00");
@@ -338,7 +331,7 @@ public class ContaGUI extends JFrame {
         }
 
         for (ContaCorrente conta : contasAgrupadas) {
-            modeloLista.addElement(
+            painelLista.getModeloLista().addElement(
                     String.format(
                             "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
                     )
@@ -377,10 +370,10 @@ public class ContaGUI extends JFrame {
     private void filtrarSaldoMaior5k() {
         List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
@@ -389,10 +382,10 @@ public class ContaGUI extends JFrame {
     private void filtrarContaPar() {
         List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
@@ -401,10 +394,10 @@ public class ContaGUI extends JFrame {
     private void ordenarSaldoDecrescente() {
         List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
@@ -413,10 +406,10 @@ public class ContaGUI extends JFrame {
     private void ordenarSaldoCrescente() {
         List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
@@ -425,10 +418,10 @@ public class ContaGUI extends JFrame {
     private void ordemAlfabeticaAZ() {
         List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
@@ -437,10 +430,10 @@ public class ContaGUI extends JFrame {
     private void ordemAlfabeticaZA() {
         List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(contas);
 
-        modeloLista.clear();
+        painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contasFiltradas) {
-            modeloLista.addElement(String.format(
+            painelLista.getModeloLista().addElement(String.format(
                     "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
             ));
         }
