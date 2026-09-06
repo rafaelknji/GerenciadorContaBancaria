@@ -44,7 +44,6 @@ public class ContaGUI extends JFrame {
         setLocationRelativeTo(null);
     }
 
-
     private void criarInterface() {
         setLayout(new BorderLayout());
 
@@ -143,13 +142,7 @@ public class ContaGUI extends JFrame {
     }
 
     private void exibirContas(List<ContaCorrente> contas) {
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contas) {
-            painelLista.getModeloLista().addElement(
-                    String.format("%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo())
-            );
-        }
+        exibirContas(contas);
     }
 
     private void carregarLista() {
