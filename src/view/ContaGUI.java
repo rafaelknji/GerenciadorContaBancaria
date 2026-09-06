@@ -3,7 +3,6 @@ package view;
 import exception.SaldoInsuficienteException;
 import model.ContaCorrente;
 import service.ContaService;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -21,7 +20,6 @@ public class ContaGUI extends JFrame {
 
 
     public ContaGUI() {
-
         contaService = new ContaService();
 
         try {
@@ -132,7 +130,6 @@ public class ContaGUI extends JFrame {
         painelOperacoes.getBtnAgrupar().addActionListener(e ->
                 AgruparSaldo.show(painelOperacoes.getBtnAgrupar(), 0, painelOperacoes.getBtnAgrupar().getHeight()));
 
-
         // Quando selecionar uma conta
         painelLista.getListaContas().addListSelectionListener(e -> {
 
@@ -145,17 +142,18 @@ public class ContaGUI extends JFrame {
         painelOperacoes.getBtnDepositar().addActionListener(e -> depositar());
     }
 
-    private void carregarLista() {
+    private void exibirContas(List<ContaCorrente> contas) {
         painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contas) {
             painelLista.getModeloLista().addElement(
-                    String.format(
-                            "%-49s %-52s R$ %.2f",
-                            conta.getNumero(), conta.getTitular(), conta.getSaldo()
-                    )
+                    String.format("%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo())
             );
         }
+    }
+
+    private void carregarLista() {
+        exibirContas(contas);
     }
 
     private ContaCorrente getContaSelecionada() {
@@ -175,7 +173,7 @@ public class ContaGUI extends JFrame {
         }
 
         painelDados.getLblNumero().setText("Número: " + conta.getNumero());
-        painelDados.getLblNumero().setText("Titular: " + conta.getTitular());
+        painelDados.getLblTitular().setText("Titular: " + conta.getTitular());
         painelDados.getLblSaldo().setText("Saldo: R$ " + conta.getSaldo());
     }
 
@@ -246,13 +244,7 @@ public class ContaGUI extends JFrame {
         List<ContaCorrente> contasFiltradas =
                 contaService.filtrarSaldoMaior10000(contas);
 
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
 
         double saldoTotal = contaService.calcularSaldoTotal(contasFiltradas);
 
@@ -264,19 +256,11 @@ public class ContaGUI extends JFrame {
 
         List<ContaCorrente> contasAgrupadas = grupos.get(categoria);
 
-        painelLista.getModeloLista().clear();
+        exibirContas(contasAgrupadas);
 
         if (contasAgrupadas == null || contasAgrupadas.isEmpty()) {
             painelSaldoTotal.getLblResultadoSaldoTotal().setText("R$ 0,00");
             return;
-        }
-
-        for (ContaCorrente conta : contasAgrupadas) {
-            painelLista.getModeloLista().addElement(
-                    String.format(
-                            "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-                    )
-            );
         }
 
         double saldoTotal = contaService.calcularSaldoTotal(contasAgrupadas);
@@ -309,76 +293,35 @@ public class ContaGUI extends JFrame {
 
     private void filtrarSaldoMaior5k() {
         List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(contas);
-
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
     }
 
     private void filtrarContaPar() {
         List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(contas);
-
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
     }
 
     private void ordenarSaldoDecrescente() {
         List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(contas);
-
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
     }
 
     private void ordenarSaldoCrescente() {
         List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(contas);
-
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
     }
 
     private void ordemAlfabeticaAZ() {
         List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(contas);
-
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
     }
 
     private void ordemAlfabeticaZA() {
         List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(contas);
-
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contasFiltradas) {
-            painelLista.getModeloLista().addElement(String.format(
-                    "%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo()
-            ));
-        }
+        exibirContas(contasFiltradas);
     }
-
 }
+
+
 
 
