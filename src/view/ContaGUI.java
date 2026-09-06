@@ -14,18 +14,10 @@ public class ContaGUI extends JFrame {
 
     private List<ContaCorrente> contas;
     private ContaService contaService;
-
     private PainelListaContas painelLista;
     private PainelDados painelDados;
-
     private PainelSaldoTotal painelSaldoTotal;
-
-    private JTextField txtValor;
-
-    private JButton btnSacar;
-    private JButton btnDepositar;
-    private JButton btnFiltros;
-    private JButton btnAgrupar;
+    private PainelOperacoes painelOperacoes;
 
 
     public ContaGUI() {
@@ -87,34 +79,17 @@ public class ContaGUI extends JFrame {
        painelDados.getBtnOrdenar().addActionListener(e ->
                menuOrdem.show(painelDados.getBtnOrdenar(), 0, painelDados.getBtnOrdenar().getHeight()));
 
-
-
         // Painel Saldo total
         painelSaldoTotal = new PainelSaldoTotal();
 
         // Operações
-        JPanel painelOperacoes = new JPanel();
-
-        txtValor = new JTextField(10);
-
-        btnSacar = new JButton("Sacar");
-        btnDepositar = new JButton("Depositar");
-        btnFiltros = new JButton("Filtros");
-        btnAgrupar = new JButton("Agrupar");
-
-        painelOperacoes.add(new JLabel("Valor:"));
-        painelOperacoes.add(txtValor);
-        painelOperacoes.add(btnSacar);
-        painelOperacoes.add(btnDepositar);
-        painelOperacoes.add(btnFiltros);
-        painelOperacoes.add(btnAgrupar);
+        painelOperacoes = new PainelOperacoes();
 
         JPanel painelInferior = new JPanel();
         painelInferior.setLayout(new GridLayout(2, 1));
         painelInferior.add(painelSaldoTotal);
         painelInferior.add(painelOperacoes);
         add(painelInferior, BorderLayout.SOUTH);
-
 
         //menu de filtros gerais
         JPopupMenu menuFiltros = new JPopupMenu();
@@ -135,8 +110,8 @@ public class ContaGUI extends JFrame {
         menuFiltros.add(itemFiltrar10k);
         menuFiltros.add(itemLimparFiltro);
 
-        btnFiltros.addActionListener(e -> menuFiltros.show(btnFiltros, 0, btnFiltros.getHeight()));
-
+        painelOperacoes.getBtnFiltros().addActionListener(e ->
+                menuFiltros.show(painelOperacoes.getBtnFiltros(), 0, painelOperacoes.getBtnFiltros().getHeight()));
 
         // Agrupar por saldo
         JPopupMenu AgruparSaldo = new JPopupMenu();
@@ -154,8 +129,8 @@ public class ContaGUI extends JFrame {
         AgruparSaldo.add(itemAte10000);
         AgruparSaldo.add(itemMaior10000);
 
-        btnAgrupar.addActionListener(e -> AgruparSaldo.show(btnAgrupar, 0, btnAgrupar.getHeight()));
-
+        painelOperacoes.getBtnAgrupar().addActionListener(e ->
+                AgruparSaldo.show(painelOperacoes.getBtnAgrupar(), 0, painelOperacoes.getBtnAgrupar().getHeight()));
 
 
         // Quando selecionar uma conta
@@ -164,18 +139,13 @@ public class ContaGUI extends JFrame {
             if (!e.getValueIsAdjusting()) {
                 mostrarContaSelecionada();
             }
-
         });
 
-        // Botão sacar
-        btnSacar.addActionListener(e -> sacar());
-
-        // Botão depositar
-        btnDepositar.addActionListener(e -> depositar());
+        painelOperacoes.getBtnSacar().addActionListener(e -> sacar());
+        painelOperacoes.getBtnDepositar().addActionListener(e -> depositar());
     }
 
     private void carregarLista() {
-
         painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contas) {
@@ -189,18 +159,15 @@ public class ContaGUI extends JFrame {
     }
 
     private ContaCorrente getContaSelecionada() {
-
         int indice = painelLista.getListaContas().getSelectedIndex();;
 
         if (indice == -1) {
             return null;
         }
-
         return contas.get(indice);
     }
 
     private void mostrarContaSelecionada() {
-
         ContaCorrente conta = getContaSelecionada();
 
         if (conta == null) {
@@ -213,7 +180,6 @@ public class ContaGUI extends JFrame {
     }
 
     private void sacar() {
-
         ContaCorrente conta = getContaSelecionada();
 
         if (conta == null) {
@@ -227,7 +193,7 @@ public class ContaGUI extends JFrame {
         }
 
         try {
-            double valor = Double.parseDouble(txtValor.getText());
+            double valor = Double.parseDouble(painelOperacoes.getTxtValor().getText());
             conta.sacar(valor);
             JOptionPane.showMessageDialog(this, "Saque realizado com sucesso!");
 
@@ -254,7 +220,7 @@ public class ContaGUI extends JFrame {
         }
 
         try {
-            double valor = Double.parseDouble(txtValor.getText());
+            double valor = Double.parseDouble(painelOperacoes.getTxtValor().getText());
             if (valor <= 0) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -327,7 +293,6 @@ public class ContaGUI extends JFrame {
     }
 
     private void atualizarTela() {
-
         carregarLista();
         mostrarContaSelecionada();
         atualizarSaldoTotal();

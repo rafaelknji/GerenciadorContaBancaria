@@ -16,10 +16,12 @@ public class PainelDados extends JPanel {
         lblNumero = new JLabel("Numero: ");
         lblTitular = new JLabel("Titular: ");
         lblSaldo = new JLabel("Saldo: ");
+        btnOrdenar = new JButton("Ordenar");
 
         add(lblNumero);
         add(lblTitular);
         add(lblSaldo);
+        add(btnOrdenar);
     }
 
     public JLabel getLblNumero() {
