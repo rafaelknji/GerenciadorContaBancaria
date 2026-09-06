@@ -16,10 +16,9 @@ public class ContaGUI extends JFrame {
     private ContaService contaService;
 
     private PainelListaContas painelLista;
+    private PainelDados painelDados;
 
-    private JLabel lblNumero;
-    private JLabel lblTitular;
-    private JLabel lblSaldo;
+
     private JLabel lblSaldoTotal;
     private JLabel lblResultadoSaldoTotal;
 
@@ -29,7 +28,6 @@ public class ContaGUI extends JFrame {
     private JButton btnDepositar;
     private JButton btnFiltros;
     private JButton btnAgrupar;
-    private JButton btnOrdenar;
 
 
     public ContaGUI() {
@@ -67,18 +65,8 @@ public class ContaGUI extends JFrame {
         add(painelLista, BorderLayout.CENTER);
 
         // Painel Informações da conta selecionada
-        JPanel painelDados = new JPanel();
-        painelDados.setLayout(new GridLayout(1, 4, 30, 10));
-
-        lblNumero = new JLabel("Número: ");
-        lblTitular = new JLabel("Titular: ");
-        lblSaldo = new JLabel("Saldo: ");
-        btnOrdenar = new JButton("Ordenar");
-
-        painelDados.add(lblNumero);
-        painelDados.add(lblTitular);
-        painelDados.add(lblSaldo);
-        painelDados.add(btnOrdenar);
+        painelDados = new PainelDados();
+        add(painelDados, BorderLayout.NORTH);
 
         JPopupMenu menuOrdem = new JPopupMenu();
 
@@ -98,10 +86,10 @@ public class ContaGUI extends JFrame {
         menuOrdem.add(itemDecrescente);
         menuOrdem.add(itemAlfabeticaAZ);
         menuOrdem.add(itemAlfabeticaZA);
-        btnOrdenar.addActionListener(e -> menuOrdem.show(btnOrdenar, 0, btnOrdenar.getHeight()));
+       painelDados.getBtnOrdenar().addActionListener(e ->
+               menuOrdem.show(painelDados.getBtnOrdenar(), 0, painelDados.getBtnOrdenar().getHeight()));
 
 
-        add(painelDados, BorderLayout.NORTH);
 
         // Painel Saldo total
         JPanel painelSaldoTotal = new JPanel();
@@ -232,9 +220,9 @@ public class ContaGUI extends JFrame {
             return;
         }
 
-        lblNumero.setText("Número: " + conta.getNumero());
-        lblTitular.setText("Titular: " + conta.getTitular());
-        lblSaldo.setText("Saldo: R$ " + conta.getSaldo());
+        painelDados.getLblNumero().setText("Número: " + conta.getNumero());
+        painelDados.getLblNumero().setText("Titular: " + conta.getTitular());
+        painelDados.getLblSaldo().setText("Saldo: R$ " + conta.getSaldo());
     }
 
     private void sacar() {
