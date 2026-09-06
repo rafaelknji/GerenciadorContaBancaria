@@ -18,9 +18,7 @@ public class ContaGUI extends JFrame {
     private PainelListaContas painelLista;
     private PainelDados painelDados;
 
-
-    private JLabel lblSaldoTotal;
-    private JLabel lblResultadoSaldoTotal;
+    private PainelSaldoTotal painelSaldoTotal;
 
     private JTextField txtValor;
 
@@ -92,18 +90,7 @@ public class ContaGUI extends JFrame {
 
 
         // Painel Saldo total
-        JPanel painelSaldoTotal = new JPanel();
-        painelSaldoTotal.setLayout(new BorderLayout());
-
-        lblSaldoTotal = new JLabel("Saldo Total:");
-        lblResultadoSaldoTotal = new JLabel("00,00");
-
-        painelSaldoTotal.add(lblSaldoTotal, BorderLayout.WEST);
-        painelSaldoTotal.add(lblResultadoSaldoTotal, BorderLayout.EAST);
-
-        painelSaldoTotal.setBorder(
-                BorderFactory.createEmptyBorder(0, 5, 0, 10)
-        );
+        painelSaldoTotal = new PainelSaldoTotal();
 
         // Operações
         JPanel painelOperacoes = new JPanel();
@@ -303,7 +290,7 @@ public class ContaGUI extends JFrame {
 
         double saldoTotal = contaService.calcularSaldoTotal(contasFiltradas);
 
-        lblResultadoSaldoTotal.setText(String.format("R$ %.2f", saldoTotal));
+        painelSaldoTotal.getLblResultadoSaldoTotal().setText(String.format("R$ %.2f", saldoTotal));
     }
 
     private void agruparSaldo(String categoria) {
@@ -314,7 +301,7 @@ public class ContaGUI extends JFrame {
         painelLista.getModeloLista().clear();
 
         if (contasAgrupadas == null || contasAgrupadas.isEmpty()) {
-            lblResultadoSaldoTotal.setText("R$ 0,00");
+            painelSaldoTotal.getLblResultadoSaldoTotal().setText("R$ 0,00");
             return;
         }
 
@@ -328,13 +315,13 @@ public class ContaGUI extends JFrame {
 
         double saldoTotal = contaService.calcularSaldoTotal(contasAgrupadas);
 
-        lblResultadoSaldoTotal.setText(String.format("R$ %.2f", saldoTotal));
+        painelSaldoTotal.getLblResultadoSaldoTotal().setText(String.format("R$ %.2f", saldoTotal));
     }
 
     private void atualizarSaldoTotal() {
         double saldoTotal = contaService.calcularSaldoTotal(contas);
 
-        lblResultadoSaldoTotal.setText(
+        painelSaldoTotal.getLblResultadoSaldoTotal().setText(
                 String.format("R$ %.2f", saldoTotal)
         );
     }
