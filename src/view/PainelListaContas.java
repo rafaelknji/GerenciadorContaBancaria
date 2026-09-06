@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class PainelListaContas extends JPanel {
 
@@ -15,7 +16,9 @@ public class PainelListaContas extends JPanel {
                 ListSelectionModel.SINGLE_SELECTION
         );
         JScrollPane scrollPane = new JScrollPane(listaContas);
-        add(scrollPane);
+
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     public JList<String> getListaContas() {
