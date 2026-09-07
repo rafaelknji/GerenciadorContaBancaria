@@ -17,6 +17,7 @@ public class ContaGUI extends JFrame {
     private PainelDados painelDados;
     private PainelSaldoTotal painelSaldoTotal;
     private PainelOperacoes painelOperacoes;
+    private MenuConta menu;
 
 
     public ContaGUI() {
@@ -55,26 +56,6 @@ public class ContaGUI extends JFrame {
         painelDados = new PainelDados();
         add(painelDados, BorderLayout.NORTH);
 
-        JPopupMenu menuOrdem = new JPopupMenu();
-
-        JMenuItem itemCrescente = new JMenuItem("Crescente(0-9)");
-        itemCrescente.addActionListener(e -> ordenarSaldoCrescente());
-
-        JMenuItem itemDecrescente = new JMenuItem("Decrescente(9-0");
-        itemDecrescente.addActionListener(e -> ordenarSaldoDecrescente());
-
-        JMenuItem itemAlfabeticaAZ = new JMenuItem("Titular(A-Z)");
-        itemAlfabeticaAZ.addActionListener(e -> ordemAlfabeticaAZ());
-
-        JMenuItem itemAlfabeticaZA = new JMenuItem("Titular(Z-A)");
-        itemAlfabeticaZA.addActionListener(e -> ordemAlfabeticaZA());
-
-        menuOrdem.add(itemCrescente);
-        menuOrdem.add(itemDecrescente);
-        menuOrdem.add(itemAlfabeticaAZ);
-        menuOrdem.add(itemAlfabeticaZA);
-       painelDados.getBtnOrdenar().addActionListener(e ->
-               menuOrdem.show(painelDados.getBtnOrdenar(), 0, painelDados.getBtnOrdenar().getHeight()));
 
         // Painel Saldo total
         painelSaldoTotal = new PainelSaldoTotal();
@@ -88,46 +69,11 @@ public class ContaGUI extends JFrame {
         painelInferior.add(painelOperacoes);
         add(painelInferior, BorderLayout.SOUTH);
 
-        //menu de filtros gerais
-        JPopupMenu menuFiltros = new JPopupMenu();
-
-        JMenuItem itemFiltrar5k = new JMenuItem("Saldo > 5K");
-        itemFiltrar5k.addActionListener(e -> filtrarSaldoMaior5k());
-
-        JMenuItem itemFiltrar10k = new JMenuItem("Saldo > R$ 10K");
-        itemFiltrar10k.addActionListener(e -> filtrarSaldoMaior10000());
-
-        JMenuItem itemLimparFiltro = new JMenuItem("Limpar filtros");
-        itemLimparFiltro.addActionListener(e -> {
-            carregarLista();
-            atualizarSaldoTotal();
-        });
-
-        menuFiltros.add(itemFiltrar5k);
-        menuFiltros.add(itemFiltrar10k);
-        menuFiltros.add(itemLimparFiltro);
-
-        painelOperacoes.getBtnFiltros().addActionListener(e ->
-                menuFiltros.show(painelOperacoes.getBtnFiltros(), 0, painelOperacoes.getBtnFiltros().getHeight()));
-
-        // Agrupar por saldo
-        JPopupMenu AgruparSaldo = new JPopupMenu();
-
-        JMenuItem itemAte5000 = new JMenuItem("Até R$ 5.000");
-        itemAte5000.addActionListener(e -> agruparSaldo("Até R$ 5.000"));
-
-        JMenuItem itemAte10000 = new JMenuItem("de R$ 5.000 a R$ 10.000");
-        itemAte10000.addActionListener(e -> agruparSaldo("R$ 5.000 a R$ 10.000"));
-
-        JMenuItem itemMaior10000 = new JMenuItem("Acima R$ 10.000");
-        itemMaior10000.addActionListener(e -> agruparSaldo("Acima de R$ 10.000"));
-
-        AgruparSaldo.add(itemAte5000);
-        AgruparSaldo.add(itemAte10000);
-        AgruparSaldo.add(itemMaior10000);
-
-        painelOperacoes.getBtnAgrupar().addActionListener(e ->
-                AgruparSaldo.show(painelOperacoes.getBtnAgrupar(), 0, painelOperacoes.getBtnAgrupar().getHeight()));
+        // Menus
+        menu = new MenuConta(this);
+        menu.configurarMenuOrdem(painelDados.getBtnOrdenar());
+        menu.configurarMenuFiltros(painelOperacoes.getBtnFiltros());
+        menu.configurarMenuAgrupar(painelOperacoes.getBtnAgrupar());
 
         // Quando selecionar uma conta
         painelLista.getListaContas().addListSelectionListener(e -> {
@@ -142,10 +88,16 @@ public class ContaGUI extends JFrame {
     }
 
     private void exibirContas(List<ContaCorrente> contas) {
-        exibirContas(contas);
+        painelLista.getModeloLista().clear();
+
+        for (ContaCorrente conta : contas) {
+            painelLista.getModeloLista().addElement(
+                    String.format("%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo())
+            );
+        }
     }
 
-    private void carregarLista() {
+    public void carregarLista() {
         exibirContas(contas);
     }
 
@@ -233,7 +185,7 @@ public class ContaGUI extends JFrame {
         }
     }
 
-    private void filtrarSaldoMaior10000() {
+    public void filtrarSaldoMaior10000() {
         List<ContaCorrente> contasFiltradas =
                 contaService.filtrarSaldoMaior10000(contas);
 
@@ -244,7 +196,7 @@ public class ContaGUI extends JFrame {
         painelSaldoTotal.getLblResultadoSaldoTotal().setText(String.format("R$ %.2f", saldoTotal));
     }
 
-    private void agruparSaldo(String categoria) {
+    public void agruparSaldo(String categoria) {
         Map<String, List<ContaCorrente>> grupos = contaService.agruparSaldo(contas);
 
         List<ContaCorrente> contasAgrupadas = grupos.get(categoria);
@@ -261,7 +213,7 @@ public class ContaGUI extends JFrame {
         painelSaldoTotal.getLblResultadoSaldoTotal().setText(String.format("R$ %.2f", saldoTotal));
     }
 
-    private void atualizarSaldoTotal() {
+    public void atualizarSaldoTotal() {
         double saldoTotal = contaService.calcularSaldoTotal(contas);
 
         painelSaldoTotal.getLblResultadoSaldoTotal().setText(
@@ -269,7 +221,7 @@ public class ContaGUI extends JFrame {
         );
     }
 
-    private void atualizarTela() {
+    public void atualizarTela() {
         carregarLista();
         mostrarContaSelecionada();
         atualizarSaldoTotal();
@@ -284,32 +236,32 @@ public class ContaGUI extends JFrame {
         }
     }
 
-    private void filtrarSaldoMaior5k() {
+    public void filtrarSaldoMaior5k() {
         List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(contas);
         exibirContas(contasFiltradas);
     }
 
-    private void filtrarContaPar() {
+    public void filtrarContaPar() {
         List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(contas);
         exibirContas(contasFiltradas);
     }
 
-    private void ordenarSaldoDecrescente() {
+    public void ordenarSaldoDecrescente() {
         List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(contas);
         exibirContas(contasFiltradas);
     }
 
-    private void ordenarSaldoCrescente() {
+    public void ordenarSaldoCrescente() {
         List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(contas);
         exibirContas(contasFiltradas);
     }
 
-    private void ordemAlfabeticaAZ() {
+    public void ordemAlfabeticaAZ() {
         List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(contas);
         exibirContas(contasFiltradas);
     }
 
-    private void ordemAlfabeticaZA() {
+    public void ordemAlfabeticaZA() {
         List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(contas);
         exibirContas(contasFiltradas);
     }
