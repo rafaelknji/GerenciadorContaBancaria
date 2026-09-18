@@ -67,18 +67,16 @@ public class ContaService {
     }
 
     public List<ContaCorrente> filtrarSaldoMaior5k (List<ContaCorrente> contas) {
-        Predicate<ContaCorrente> saldoMaior5k = c -> c.getSaldo() > 5000;
         List<ContaCorrente> resultado = contas.stream()
-                .filter(saldoMaior5k)
-                .collect((Collectors.toList()));
+                .filter(c -> c.getSaldo() > 500)
+                .toList();
         return resultado;
     }
 
     public List<ContaCorrente> filtrarContaPar (List<ContaCorrente> contas) {
-        Predicate<ContaCorrente> contasPar = c -> c.getNumero() % 2==0;
         List<ContaCorrente> resultado = contas.stream()
-                .filter(contasPar)
-                .collect(Collectors.toList());
+                .filter(c -> c.getNumero() % 2 == 0)
+                .toList();
         return resultado;
     }
 
