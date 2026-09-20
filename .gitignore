@@ -28,3 +28,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+/.idea/sqldialects.xml
+/.idea/libraries/mysql_connector_j_26_7_0.xml
