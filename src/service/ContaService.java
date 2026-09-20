@@ -1,7 +1,7 @@
 package service;
 
+import connection.ContaDAO;
 import exception.SaldoInsuficienteException;
-import model.Conta;
 import model.ContaCorrente;
 import java.io.*;
 import java.nio.file.*;
@@ -9,15 +9,49 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ContaService {
+    private List<ContaCorrente> contas;
+    private ContaDAO contaDAO;
+
+    public ContaService() {
+        contas = new ArrayList<>();
+        contaDAO = new ContaDAO();
+        carregarContas();
+    }
+
+    public List<ContaCorrente> getContas() {
+        return contas;
+    }
+
+    public void carregarContas() {
+        contas.clear();
+        contas.addAll(contaDAO.listar());
+    }
+
+    public void inserir (ContaCorrente conta) {
+        contaDAO.inserir(conta);
+        contas.add(conta);
+    }
+
+    public void depositar (ContaCorrente conta, double valor) {
+        conta.depositar(valor);
+        contaDAO.atualizarSaldo(conta.getNumero(), conta.getSaldo());
+    }
+
+    public void sacar (ContaCorrente conta, double valor) throws SaldoInsuficienteException {
+        conta.sacar(valor);
+        contaDAO.atualizarSaldo(conta.getNumero(), conta.getSaldo());
+    }
+
+    public void removerConta (ContaCorrente conta) {
+        contaDAO.deletar(conta.getNumero());
+        contas.remove(conta);
+    }
 
     public List<ContaCorrente> lerContas(String caminho) throws IOException {
-
         List<ContaCorrente> contas = new ArrayList<>();
-
         List<String> linhas = Files.readAllLines(Paths.get(caminho));
 
         for(String linha : linhas){
@@ -82,7 +116,6 @@ public class ContaService {
 
 
     // Ordenacao
-
     public List<ContaCorrente> ordenarSaldoDecrescente (List<ContaCorrente> contas) {
         Comparator<ContaCorrente> porSaldoDecrescente = (c1, c2) ->
                 Double.compare(c2.getSaldo(), c1.getSaldo());
@@ -114,12 +147,5 @@ public class ContaService {
 
         return contas;
     }
-
-
-
-
-
-
-
 }
 

@@ -1,39 +1,26 @@
 package view;
-
 import exception.SaldoInsuficienteException;
 import model.ContaCorrente;
 import service.ContaService;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ContaGUI extends JFrame {
-
-    private List<ContaCorrente> contas;
     private ContaService contaService;
     private PainelListaContas painelLista;
     private PainelDados painelDados;
     private PainelSaldoTotal painelSaldoTotal;
     private PainelOperacoes painelOperacoes;
     private MenuConta menu;
-
+    private List<ContaCorrente> contasExibidas;
 
     public ContaGUI() {
         contaService = new ContaService();
-
-        try {
-            contas = contaService.lerContas("conta.txt");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Erro ao carregar contas: " + e.getMessage(),
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
+        contasExibidas = new ArrayList<>();
 
         criarInterface();
         carregarLista();
@@ -43,6 +30,10 @@ public class ContaGUI extends JFrame {
         setSize(650, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+    }
+
+    private List<ContaCorrente> getContas() {
+        return contaService.getContas();
     }
 
     private void criarInterface() {
@@ -55,7 +46,6 @@ public class ContaGUI extends JFrame {
         // Painel Informações da conta selecionada
         painelDados = new PainelDados();
         add(painelDados, BorderLayout.NORTH);
-
 
         // Painel Saldo total
         painelSaldoTotal = new PainelSaldoTotal();
@@ -88,6 +78,7 @@ public class ContaGUI extends JFrame {
     }
 
     private void exibirContas(List<ContaCorrente> contas) {
+        contasExibidas = contas;
         painelLista.getModeloLista().clear();
 
         for (ContaCorrente conta : contas) {
@@ -98,7 +89,7 @@ public class ContaGUI extends JFrame {
     }
 
     public void carregarLista() {
-        exibirContas(contas);
+        exibirContas(getContas());
     }
 
     private ContaCorrente getContaSelecionada() {
@@ -107,7 +98,7 @@ public class ContaGUI extends JFrame {
         if (indice == -1) {
             return null;
         }
-        return contas.get(indice);
+        return contasExibidas.get(indice);
     }
 
     private void mostrarContaSelecionada() {
@@ -137,7 +128,7 @@ public class ContaGUI extends JFrame {
 
         try {
             double valor = Double.parseDouble(painelOperacoes.getTxtValor().getText());
-            conta.sacar(valor);
+            contaService.sacar(conta, valor);
             JOptionPane.showMessageDialog(this, "Saque realizado com sucesso!");
 
             atualizarTela();
@@ -174,7 +165,7 @@ public class ContaGUI extends JFrame {
                 return;
             }
 
-            conta.depositar(valor);
+            contaService.depositar(conta, valor);
             JOptionPane.showMessageDialog(this, "Depósito realizado com sucesso!");
             atualizarTela();
 
@@ -187,7 +178,7 @@ public class ContaGUI extends JFrame {
 
     public void filtrarSaldoMaior10000() {
         List<ContaCorrente> contasFiltradas =
-                contaService.filtrarSaldoMaior10000(contas);
+                contaService.filtrarSaldoMaior10000(getContas());
 
         exibirContas(contasFiltradas);
 
@@ -197,7 +188,7 @@ public class ContaGUI extends JFrame {
     }
 
     public void agruparSaldo(String categoria) {
-        Map<String, List<ContaCorrente>> grupos = contaService.agruparSaldo(contas);
+        Map<String, List<ContaCorrente>> grupos = contaService.agruparSaldo(getContas());
 
         List<ContaCorrente> contasAgrupadas = grupos.get(categoria);
 
@@ -214,7 +205,7 @@ public class ContaGUI extends JFrame {
     }
 
     public void atualizarSaldoTotal() {
-        double saldoTotal = contaService.calcularSaldoTotal(contas);
+        double saldoTotal = contaService.calcularSaldoTotal(getContas());
 
         painelSaldoTotal.getLblResultadoSaldoTotal().setText(
                 String.format("R$ %.2f", saldoTotal)
@@ -225,44 +216,35 @@ public class ContaGUI extends JFrame {
         carregarLista();
         mostrarContaSelecionada();
         atualizarSaldoTotal();
-
-        try {
-            contaService.atualizarConta(contas, "contas_atualizadas.txt");
-        } catch (IOException e) {
-
-            JOptionPane.showMessageDialog(
-                    this, "Erro ao salvar contas: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE
-            );
-        }
     }
 
     public void filtrarSaldoMaior5k() {
-        List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(contas);
+        List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(getContas());
         exibirContas(contasFiltradas);
     }
 
     public void filtrarContaPar() {
-        List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(contas);
+        List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(getContas());
         exibirContas(contasFiltradas);
     }
 
     public void ordenarSaldoDecrescente() {
-        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(contas);
+        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(getContas());
         exibirContas(contasFiltradas);
     }
 
     public void ordenarSaldoCrescente() {
-        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(contas);
+        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(getContas());
         exibirContas(contasFiltradas);
     }
 
     public void ordemAlfabeticaAZ() {
-        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(contas);
+        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(getContas());
         exibirContas(contasFiltradas);
     }
 
     public void ordemAlfabeticaZA() {
-        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(contas);
+        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(getContas());
         exibirContas(contasFiltradas);
     }
 }

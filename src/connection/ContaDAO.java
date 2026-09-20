@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class contaDAO {
+public class ContaDAO {
     public void inserir (Conta conta) {
         String sql = "INSERT INTO dados_conta (numero, titular, saldo) VALUES (?, ?, ?)";
 
@@ -27,8 +27,8 @@ public class contaDAO {
     }
 
 
-    public List<Conta> listar () {
-        List<Conta> contas = new ArrayList<>();
+    public List<ContaCorrente> listar () {
+        List<ContaCorrente> contas = new ArrayList<>();
         String sql = "SELECT * FROM dados_conta";
 
         try (
@@ -109,9 +109,5 @@ public class contaDAO {
             e.printStackTrace();
         }
     }
-
-
-
-
 
 }
