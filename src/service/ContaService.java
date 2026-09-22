@@ -45,6 +45,11 @@ public class ContaService {
         contaDAO.atualizarSaldo(conta.getNumero(), conta.getSaldo());
     }
 
+    public void atualizarSaldo(ContaCorrente conta, double novoSaldo) {
+        conta.setSaldo(novoSaldo);
+        contaDAO.atualizarSaldo(conta.getNumero(), novoSaldo);
+    }
+
     public void removerConta (ContaCorrente conta) {
         contaDAO.remover(conta.getNumero());
         contas.remove(conta);
@@ -74,8 +79,11 @@ public class ContaService {
 
             linhas.add(dados);
         }
-
         Files.write(Paths.get(caminho), linhas);
+    }
+
+    public void transferir(int numeroOrigem, int numeroDestino, double valor) {
+        contaDAO.transferir(numeroOrigem, numeroDestino, valor);
     }
 
     public List<ContaCorrente> filtrarSaldoMaior10000(List<ContaCorrente> contas) {

@@ -3,7 +3,8 @@ package view.paineis;
 import javax.swing.*;
 import java.awt.*;
 
-public class PainelMenuLateral extends JPanel{
+public class PainelMenuLateral extends JPanel {
+
     private JButton btnInicio;
     private JButton btnNovaConta;
     private JButton btnListarContas;
@@ -14,6 +15,7 @@ public class PainelMenuLateral extends JPanel{
     public PainelMenuLateral() {
 
         setLayout(new GridLayout(8, 1, 0, 5));
+
         setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
 
         btnInicio = new JButton("Início");
@@ -49,4 +51,3 @@ public class PainelMenuLateral extends JPanel{
         return btnHistorico;
     }
 }
-
