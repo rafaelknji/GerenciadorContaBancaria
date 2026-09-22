@@ -26,29 +26,20 @@ public class CriarConta extends JDialog {
     }
 
     private void criarInterface() {
-
         setLayout(new BorderLayout(10, 10));
 
         JPanel painelCampos = new JPanel(new GridLayout(3, 2, 10, 10));
-
         painelCampos.setBorder(BorderFactory.createEmptyBorder(20, 20, 5, 20));
 
         txtNumero = new JTextField();
-
         txtTitular = new JTextField();
-
         txtSaldo = new JTextField();
 
         painelCampos.add(new JLabel("Número:"));
-
         painelCampos.add(txtNumero);
-
         painelCampos.add(new JLabel("Titular:"));
-
         painelCampos.add(txtTitular);
-
         painelCampos.add(new JLabel("Saldo inicial:"));
-
         painelCampos.add(txtSaldo);
 
         add(painelCampos, BorderLayout.CENTER);
@@ -56,17 +47,14 @@ public class CriarConta extends JDialog {
         JPanel painelBotoes = new JPanel();
 
         btnCadastrar = new JButton("Cadastrar");
-
         btnCancelar = new JButton("Cancelar");
 
         painelBotoes.add(btnCadastrar);
-
         painelBotoes.add(btnCancelar);
 
         add(painelBotoes, BorderLayout.SOUTH);
 
         btnCadastrar.addActionListener(e -> cadastrar());
-
         btnCancelar.addActionListener(e -> dispose());
     }
 

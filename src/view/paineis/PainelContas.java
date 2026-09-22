@@ -31,8 +31,12 @@ public class PainelContas extends JPanel {
 
         // Cabeçalho
         JPanel cabecalho = new JPanel(new BorderLayout());
+        JMenuBar barraMenu = new JMenuBar();
 
         menuFiltro = new JMenu("Filtro");
+
+        barraMenu.add(menuFiltro);
+
 
         JMenuItem itemTodas = new JMenuItem("Todas as contas");
         JMenuItem itemSaldo5000 = new JMenuItem("Saldo maior que 5000");
@@ -47,7 +51,7 @@ public class PainelContas extends JPanel {
         menuFiltro.add(itemSaldoDecrescente);
         menuFiltro.add(itemAlfabetica);
 
-        cabecalho.add(menuFiltro, BorderLayout.EAST);
+        cabecalho.add(barraMenu, BorderLayout.EAST);
 
         add(cabecalho, BorderLayout.NORTH);
 

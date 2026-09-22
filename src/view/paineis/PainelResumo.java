@@ -2,7 +2,6 @@ package view.paineis;
 
 import model.ContaCorrente;
 import service.ContaService;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
