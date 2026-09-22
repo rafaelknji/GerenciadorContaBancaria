@@ -1,6 +1,6 @@
 package service;
 
-import model.TarifaStrategy;
+import strategy.TarifaStrategy;
 
 public class TarifaService {
 

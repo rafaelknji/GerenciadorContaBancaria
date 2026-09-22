@@ -1,0 +1,46 @@
+package view.paineis;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class PainelResumo extends JPanel {
+    private JLabel lblTotalContas;
+    private JLabel lblSaldoTotal;
+
+    public PainelResumo() {
+        setLayout(new GridLayout(1, 2, 20, 0));
+        setBorder(BorderFactory.createTitledBorder("Resumo"));
+
+        JPanel painelContas = new JPanel();
+        painelContas.setLayout(new BoxLayout(painelContas, BoxLayout.Y_AXIS));
+
+        painelContas.add(new JLabel("Total de contas"));
+
+        lblTotalContas = new JLabel("0");
+        lblTotalContas.setFont(new Font("Arial", Font.BOLD, 26));
+
+        painelContas.add(lblTotalContas);
+
+        JPanel painelSaldo = new JPanel();
+        painelSaldo.setLayout(new BoxLayout(painelSaldo, BoxLayout.Y_AXIS));
+
+        painelSaldo.add(new JLabel("Saldo total"));
+
+        lblSaldoTotal = new JLabel("R$ 0,00");
+        lblSaldoTotal.setFont(new Font("Arial", Font.BOLD, 26));
+
+        painelSaldo.add(lblSaldoTotal);
+
+        add(painelContas);
+        add(painelSaldo);
+    }
+
+    public JLabel getLblTotalContas() {
+        return lblTotalContas;
+    }
+
+    public JLabel getLblSaldoTotal() {
+        return lblSaldoTotal;
+    }
+}
+

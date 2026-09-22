@@ -1,4 +1,4 @@
-package model;
+package strategy;
 
 public enum TarifaStrategy {
     FIXA {

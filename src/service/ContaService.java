@@ -22,7 +22,7 @@ public class ContaService {
     }
 
     public List<ContaCorrente> getContas() {
-        return contas;
+        return contaDAO.listar();
     }
 
     public void carregarContas() {

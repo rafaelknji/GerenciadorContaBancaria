@@ -1,119 +1,117 @@
 package view;
-import exception.SaldoInsuficienteException;
 import model.ContaCorrente;
-import service.ContaService;
+
+import view.paineis.PainelContas;
+import view.paineis.PainelContaSelecionada;
+import view.paineis.PainelMenuLateral;
+import view.paineis.PainelResumo;
+
+import connection.ContaDAO;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ContaGUI extends JFrame {
-    private ContaService contaService;
-    private PainelListaContas painelLista;
-    private PainelDados painelDados;
-    private PainelSaldoTotal painelSaldoTotal;
-    private PainelOperacoes painelOperacoes;
-    private MenuConta menu;
+    private PainelContas painelContas;
+    private PainelContaSelecionada painelContaSelecionada;
+    private PainelMenuLateral painelMenuLateral;
+    private PainelResumo painelResumo;
+
     private List<ContaCorrente> contasExibidas;
+    private ContaDAO contaDAO;
 
     public ContaGUI() {
-        contaService = new ContaService();
+        contaDAO = new ContaDAO();
         contasExibidas = new ArrayList<>();
 
         criarInterface();
         carregarLista();
-        atualizarSaldoTotal();
 
         setTitle("Gerenciador de Contas Bancárias");
-        setSize(650, 550);
+        setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-    }
-
-    private List<ContaCorrente> getContas() {
-        return contaService.getContas();
     }
 
     private void criarInterface() {
         setLayout(new BorderLayout());
 
-        // Lista das contas
-        painelLista = new PainelListaContas();
-        add(painelLista, BorderLayout.CENTER);
+        // Menu Lateral
+        painelMenuLateral = new PainelMenuLateral();
+        painelMenuLateral.setPreferredSize(new Dimension(220, 0));
+        add(painelMenuLateral, BorderLayout.WEST);
 
-        // Painel Informações da conta selecionada
-        painelDados = new PainelDados();
-        add(painelDados, BorderLayout.NORTH);
+        // Tabela de contas
+        painelContas = new PainelContas();
 
-        // Painel Saldo total
-        painelSaldoTotal = new PainelSaldoTotal();
+        // conta selecionada
+        painelContaSelecionada = new PainelContaSelecionada();
+        painelContaSelecionada.setPreferredSize(new Dimension(350, 0));
 
-        // Operações
-        painelOperacoes = new PainelOperacoes();
+        // Resumo
+        painelResumo = new PainelResumo();
+        painelResumo.setPreferredSize(new Dimension(0, 150));
 
-        JPanel painelInferior = new JPanel();
-        painelInferior.setLayout(new GridLayout(2, 1));
-        painelInferior.add(painelSaldoTotal);
-        painelInferior.add(painelOperacoes);
-        add(painelInferior, BorderLayout.SOUTH);
+        // Painel central
+        JPanel painelCentro = new JPanel(new BorderLayout(10, 10));
 
-        // Menus
-        menu = new MenuConta(this);
-        menu.configurarMenuOrdem(painelDados.getBtnOrdenar());
-        menu.configurarMenuFiltros(painelOperacoes.getBtnFiltros());
-        menu.configurarMenuAgrupar(painelOperacoes.getBtnAgrupar());
+        painelCentro.setBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        );
 
-        // Quando selecionar uma conta
-        painelLista.getListaContas().addListSelectionListener(e -> {
+        painelCentro.add(painelContas, BorderLayout.CENTER);
+        painelCentro.add(painelResumo, BorderLayout.SOUTH);
 
-            if (!e.getValueIsAdjusting()) {
-                mostrarContaSelecionada();
-            }
-        });
+        add(painelCentro, BorderLayout.CENTER);
+        add(painelContaSelecionada, BorderLayout.EAST);
 
-        painelOperacoes.getBtnSacar().addActionListener(e -> sacar());
-        painelOperacoes.getBtnDepositar().addActionListener(e -> depositar());
+        // Seleção da tabela
+        painelContas.getTabela().getSelectionModel()
+                .addListSelectionListener(e -> {
+
+                    if (!e.getValueIsAdjusting()) {
+                        mostrarContaSelecionada();
+                    }
+                });
+
+
+        // Btn excluir
+        painelContaSelecionada.getBtnExcluir()
+                .addActionListener(e -> excluirConta());
+
+        // Btn atualizar
+        painelContaSelecionada.getBtnAtualizar()
+                .addActionListener(e -> atualizarSaldo());
+
+        painelMenuLateral.getBtnNovaConta()
+                .addActionListener(e -> {
+                    CriarConta janela = new CriarConta(this);
+                    janela.setVisible(true);
+                    carregarLista();
+                });
     }
 
-    private void exibirContas(List<ContaCorrente> contas) {
-        contasExibidas = contas;
-        painelLista.getModeloLista().clear();
-
-        for (ContaCorrente conta : contas) {
-            painelLista.getModeloLista().addElement(
-                    String.format("%-49s %-52s R$ %.2f", conta.getNumero(), conta.getTitular(), conta.getSaldo())
-            );
-        }
-    }
 
     public void carregarLista() {
-        exibirContas(getContas());
-    }
+        contasExibidas = contaDAO.listar();
 
-    private ContaCorrente getContaSelecionada() {
-        int indice = painelLista.getListaContas().getSelectedIndex();;
+        painelContas.getModeloTabela().setRowCount(0);
 
-        if (indice == -1) {
-            return null;
+        for (ContaCorrente conta : contasExibidas) {
+
+            painelContas.getModeloTabela().addRow(new Object[]{
+                    conta.getNumero(),
+                    conta.getTitular(),
+                    String.format("R$ %.2f", conta.getSaldo()),
+                    "-"
+            });
         }
-        return contasExibidas.get(indice);
+        atualizarResumo();
     }
 
-    private void mostrarContaSelecionada() {
-        ContaCorrente conta = getContaSelecionada();
-
-        if (conta == null) {
-            return;
-        }
-
-        painelDados.getLblNumero().setText("Número: " + conta.getNumero());
-        painelDados.getLblTitular().setText("Titular: " + conta.getTitular());
-        painelDados.getLblSaldo().setText("Saldo: R$ " + conta.getSaldo());
-    }
-
-    private void sacar() {
+    private void atualizarSaldo() {
         ContaCorrente conta = getContaSelecionada();
 
         if (conta == null) {
@@ -127,127 +125,116 @@ public class ContaGUI extends JFrame {
         }
 
         try {
-            double valor = Double.parseDouble(painelOperacoes.getTxtValor().getText());
-            contaService.sacar(conta, valor);
-            JOptionPane.showMessageDialog(this, "Saque realizado com sucesso!");
+            double novoSaldo = Double.parseDouble(
+                    painelContaSelecionada.getTxtSaldo().getText().replace(",", ".")
+            );
+            contaDAO.atualizarSaldo(conta.getNumero(), novoSaldo);
 
-            atualizarTela();
-
-        } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(
-                    this, "Digite um valor válido.", "Erro", JOptionPane.ERROR_MESSAGE
+                    this,
+                    "Saldo atualizado com sucesso!"
             );
 
-        } catch (SaldoInsuficienteException e) {
+            carregarLista();
+            limparContaSelecionada();
+
+        } catch (NumberFormatException e) {
+
             JOptionPane.showMessageDialog(
-                    this, e.getMessage(), "Saque não realizado!", JOptionPane.ERROR_MESSAGE
+                    this,
+                    "Digite um valor válido.",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
             );
         }
     }
 
-    private void depositar() {
+    private ContaCorrente getContaSelecionada() {
+        int linha = painelContas.getTabela().getSelectedRow();;
+
+        if (linha == -1) {
+            return null;
+        }
+        return contasExibidas.get(linha);
+    }
+
+    private void mostrarContaSelecionada() {
         ContaCorrente conta = getContaSelecionada();
+
         if (conta == null) {
-            JOptionPane.showMessageDialog(
-                    this, "Selecione uma conta.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        try {
-            double valor = Double.parseDouble(painelOperacoes.getTxtValor().getText());
-            if (valor <= 0) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "O valor do depósito deve ser positivo.",
-                        "Erro",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
+        painelContaSelecionada.getLblNumero().setText("Número: " + conta.getNumero());
+        painelContaSelecionada.getLblTitular().setText("Titular: " + conta.getTitular());
+        painelContaSelecionada.getTxtSaldo().setText(String.format("%.2f", conta.getSaldo()));
+    }
 
-            contaService.depositar(conta, valor);
-            JOptionPane.showMessageDialog(this, "Depósito realizado com sucesso!");
-            atualizarTela();
+    private void excluirConta() {
+        ContaCorrente conta = getContaSelecionada();
 
-        } catch (NumberFormatException e) {
+        if(conta == null) {
             JOptionPane.showMessageDialog(
-                    this, "Digite um valor válido.", "Erro", JOptionPane.ERROR_MESSAGE
+                    this, "Selecione uma conta",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
             );
-        }
-    }
-
-    public void filtrarSaldoMaior10000() {
-        List<ContaCorrente> contasFiltradas =
-                contaService.filtrarSaldoMaior10000(getContas());
-
-        exibirContas(contasFiltradas);
-
-        double saldoTotal = contaService.calcularSaldoTotal(contasFiltradas);
-
-        painelSaldoTotal.getLblResultadoSaldoTotal().setText(String.format("R$ %.2f", saldoTotal));
-    }
-
-    public void agruparSaldo(String categoria) {
-        Map<String, List<ContaCorrente>> grupos = contaService.agruparSaldo(getContas());
-
-        List<ContaCorrente> contasAgrupadas = grupos.get(categoria);
-
-        exibirContas(contasAgrupadas);
-
-        if (contasAgrupadas == null || contasAgrupadas.isEmpty()) {
-            painelSaldoTotal.getLblResultadoSaldoTotal().setText("R$ 0,00");
             return;
         }
-
-        double saldoTotal = contaService.calcularSaldoTotal(contasAgrupadas);
-
-        painelSaldoTotal.getLblResultadoSaldoTotal().setText(String.format("R$ %.2f", saldoTotal));
-    }
-
-    public void atualizarSaldoTotal() {
-        double saldoTotal = contaService.calcularSaldoTotal(getContas());
-
-        painelSaldoTotal.getLblResultadoSaldoTotal().setText(
-                String.format("R$ %.2f", saldoTotal)
+        int resposta = JOptionPane.showConfirmDialog(
+                this,
+                "Deseja realmente excluir a conta " + conta.getNumero() + "?",
+                "Confirmar exclusão",
+                JOptionPane.YES_NO_OPTION
         );
+
+        if (resposta == JOptionPane.YES_OPTION) {
+
+            contaDAO.remover(conta.getNumero());
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Conta excluída com sucesso!"
+            );
+
+            carregarLista();
+            limparContaSelecionada();
+        }
     }
+
+
+    public void atualizarResumo() {
+        double saldoTotal = 0;
+
+        for (ContaCorrente conta : contasExibidas) {
+            saldoTotal += conta.getSaldo();
+        }
+
+        painelResumo.getLblTotalContas()
+                .setText(String.valueOf(contasExibidas.size()));
+
+        painelResumo.getLblSaldoTotal()
+                .setText(String.format("R$ %.2f", saldoTotal));
+    }
+
 
     public void atualizarTela() {
         carregarLista();
-        mostrarContaSelecionada();
-        atualizarSaldoTotal();
+        int linha = painelContas.getTabela().getSelectedRow();
+        if (linha != -1) {
+            mostrarContaSelecionada();
+        }
     }
 
-    public void filtrarSaldoMaior5k() {
-        List<ContaCorrente> contasFiltradas = contaService.filtrarSaldoMaior5k(getContas());
-        exibirContas(contasFiltradas);
-    }
 
-    public void filtrarContaPar() {
-        List<ContaCorrente> contasFiltradas = contaService.filtrarContaPar(getContas());
-        exibirContas(contasFiltradas);
-    }
-
-    public void ordenarSaldoDecrescente() {
-        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoDecrescente(getContas());
-        exibirContas(contasFiltradas);
-    }
-
-    public void ordenarSaldoCrescente() {
-        List<ContaCorrente> contasFiltradas = contaService.ordenarSaldoCrescente(getContas());
-        exibirContas(contasFiltradas);
-    }
-
-    public void ordemAlfabeticaAZ() {
-        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaAZ(getContas());
-        exibirContas(contasFiltradas);
-    }
-
-    public void ordemAlfabeticaZA() {
-        List<ContaCorrente> contasFiltradas = contaService.ordemAlfabeticaZA(getContas());
-        exibirContas(contasFiltradas);
+    private void limparContaSelecionada() {
+        painelContaSelecionada.getLblNumero().setText("Número: -");
+        painelContaSelecionada.getLblTitular().setText("Titular: -");
+        painelContaSelecionada.getTxtSaldo().setText("R$ 0,00");
     }
 }
+
+
 
 
 
