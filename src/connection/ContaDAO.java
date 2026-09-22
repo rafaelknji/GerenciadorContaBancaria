@@ -1,4 +1,5 @@
 package connection;
+
 import model.Conta;
 import model.ContaCorrente;
 
@@ -7,13 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContaDAO {
-    public void inserir (Conta conta) {
-        String sql = "INSERT INTO dados_conta (numero, titular, saldo) VALUES (?, ?, ?)";
+
+    public void inserir(Conta conta) {
+
+        String sql =
+                "INSERT INTO dados_conta " +
+                        "(numero, titular, saldo) " +
+                        "VALUES (?, ?, ?)";
 
         try (
-            Connection con = Conexao.getConnection();
-            PreparedStatement stmt = con.prepareStatement(sql)
-        ){
+                Connection con = Conexao.getConnection();
+                PreparedStatement stmt = con.prepareStatement(sql)
+        ) {
+
             stmt.setInt(1, conta.getNumero());
             stmt.setString(2, conta.getTitular());
             stmt.setDouble(3, conta.getSaldo());
@@ -25,42 +32,57 @@ public class ContaDAO {
         }
     }
 
+    public List<ContaCorrente> listar() {
 
-    public List<ContaCorrente> listar () {
-        List<ContaCorrente> contas = new ArrayList<>();
-        String sql = "SELECT * FROM dados_conta";
+        List<ContaCorrente> contas =
+                new ArrayList<>();
 
-        try (
-            Connection con = Conexao.getConnection();
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)
-        ){
-            while (rs.next()) {
-                ContaCorrente c = new ContaCorrente(
-                        rs.getString("titular"),
-                        rs.getInt("numero"),
-                        rs.getDouble("saldo")
-                );
-                contas.add(c);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return contas;
-    }
-
-
-    public Conta buscarPorNumero (int numero) {
-        String sql = "SELECT * FROM dados_conta WHERE numero = ?";
+        String sql =
+                "SELECT * FROM dados_conta";
 
         try (
                 Connection con = Conexao.getConnection();
-                PreparedStatement stmt = con.prepareStatement(sql)
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)
+        ) {
+
+            while (rs.next()) {
+
+                ContaCorrente c =
+                        new ContaCorrente(
+                                rs.getString("titular"),
+                                rs.getInt("numero"),
+                                rs.getDouble("saldo")
+                        );
+
+                contas.add(c);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return contas;
+    }
+
+    public Conta buscarPorNumero(int numero) {
+
+        String sql =
+                "SELECT * FROM dados_conta " +
+                        "WHERE numero = ?";
+
+        try (
+                Connection con = Conexao.getConnection();
+                PreparedStatement stmt =
+                        con.prepareStatement(sql)
         ) {
 
             stmt.setInt(1, numero);
+
             try (ResultSet rs = stmt.executeQuery()) {
+
                 if (rs.next()) {
+
                     return new ContaCorrente(
                             rs.getString("titular"),
                             rs.getInt("numero"),
@@ -69,22 +91,31 @@ public class ContaDAO {
                 }
             }
 
-        }catch (SQLException e) {
-                e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
         return null;
     }
 
+    public void atualizarSaldo(
+            int numero,
+            double novoSaldo) {
 
-    public void atualizarSaldo (int numero, double novoSaldo) {
-        String sql = "UPDATE dados_conta SET saldo = ? WHERE numero = ?";
+        String sql =
+                "UPDATE dados_conta " +
+                        "SET saldo = ? " +
+                        "WHERE numero = ?";
 
         try (
-            Connection con = Conexao.getConnection();
-            PreparedStatement stmt = con.prepareStatement(sql)
-        ){
+                Connection con = Conexao.getConnection();
+                PreparedStatement stmt =
+                        con.prepareStatement(sql)
+        ) {
+
             stmt.setDouble(1, novoSaldo);
             stmt.setInt(2, numero);
+
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -92,14 +123,20 @@ public class ContaDAO {
         }
     }
 
-    public void remover (int numero) {
-        String sql = "DELETE FROM dados_conta WHERE numero = ?";
+    public void remover(int numero) {
+
+        String sql =
+                "DELETE FROM dados_conta " +
+                        "WHERE numero = ?";
 
         try (
-            Connection con = Conexao.getConnection();
-            PreparedStatement stmt = con.prepareStatement(sql)
-        ){
+                Connection con = Conexao.getConnection();
+                PreparedStatement stmt =
+                        con.prepareStatement(sql)
+        ) {
+
             stmt.setInt(1, numero);
+
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -107,39 +144,97 @@ public class ContaDAO {
         }
     }
 
-    public void transferir (int origem, int destino, double valor) {
-        String creditoSql = "UPDATE dados_conta SET saldo = saldo + ? WHERE numero = ?";
-        String debitoSql = "UPDATE dados_conta SET saldo = saldo - ? WHERE numero = ?";
+    public boolean transferir(
+            int origem,
+            int destino,
+            double valor,
+            double tarifa) {
 
-        try(Connection con = Conexao.getConnection()) {
+        String creditoSql =
+                "UPDATE dados_conta " +
+                        "SET saldo = saldo + ? " +
+                        "WHERE numero = ?";
+
+        String debitoSql =
+                "UPDATE dados_conta " +
+                        "SET saldo = saldo - ? " +
+                        "WHERE numero = ?";
+
+        try (Connection con = Conexao.getConnection()) {
+
             con.setAutoCommit(false);
 
             try (
-                    PreparedStatement debito = con.prepareStatement(debitoSql);
-                    PreparedStatement credito = con.prepareStatement(creditoSql);
-                    ){
-                debito.setDouble(1, valor);
-                debito.setInt(2, origem);
+                    PreparedStatement debito =
+                            con.prepareStatement(debitoSql);
+
+                    PreparedStatement credito =
+                            con.prepareStatement(creditoSql)
+            ) {
+
+                // valor + tarifa sai da conta de origem
+                debito.setDouble(
+                        1,
+                        valor + tarifa
+                );
+
+                debito.setInt(
+                        2,
+                        origem
+                );
+
                 debito.executeUpdate();
 
-                credito.setDouble(1, valor);
-                credito.setInt(2, destino);
+                // somente o valor da transferência
+                // entra na conta de destino
+                credito.setDouble(
+                        1,
+                        valor
+                );
+
+                credito.setInt(
+                        2,
+                        destino
+                );
+
                 credito.executeUpdate();
 
                 con.commit();
 
-                System.out.println("Transferencia realiza com sucesso!");
+                System.out.println(
+                        "Transferência realizada com sucesso!"
+                );
+
+                return true;
 
             } catch (SQLException e) {
+
                 con.rollback();
-                System.err.println("Erro na transação. Rollback realizado!");
-                System.out.println("Erro: " + e.getMessage());
+
+                System.err.println(
+                        "Erro na transação. " +
+                                "Rollback realizado!"
+                );
+
+                System.out.println(
+                        "Erro: " + e.getMessage()
+                );
+
+                return false;
 
             } finally {
+
                 con.setAutoCommit(true);
             }
+
         } catch (SQLException e) {
-            System.out.println("Erro na conexao: " + e.getMessage());
+
+            System.out.println(
+                    "Erro na conexão: " +
+                            e.getMessage()
+            );
+
+            return false;
         }
     }
 }
