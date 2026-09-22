@@ -46,7 +46,7 @@ public class ContaService {
     }
 
     public void removerConta (ContaCorrente conta) {
-        contaDAO.deletar(conta.getNumero());
+        contaDAO.remover(conta.getNumero());
         contas.remove(conta);
     }
 

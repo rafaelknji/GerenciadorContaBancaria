@@ -14,7 +14,6 @@ public class ContaDAO {
             Connection con = Conexao.getConnection();
             PreparedStatement stmt = con.prepareStatement(sql)
         ){
-
             stmt.setInt(1, conta.getNumero());
             stmt.setString(2, conta.getTitular());
             stmt.setDouble(3, conta.getSaldo());
@@ -84,7 +83,6 @@ public class ContaDAO {
             Connection con = Conexao.getConnection();
             PreparedStatement stmt = con.prepareStatement(sql)
         ){
-
             stmt.setDouble(1, novoSaldo);
             stmt.setInt(2, numero);
             stmt.executeUpdate();
@@ -94,20 +92,54 @@ public class ContaDAO {
         }
     }
 
-    public void deletar (int numero) {
+    public void remover (int numero) {
         String sql = "DELETE FROM dados_conta WHERE numero = ?";
 
         try (
             Connection con = Conexao.getConnection();
             PreparedStatement stmt = con.prepareStatement(sql)
         ){
-
             stmt.setInt(1, numero);
             stmt.executeUpdate();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    public void transferir (int origem, int destino, double valor) {
+        String creditoSql = "UPDATE dados_conta SET saldo = saldo + ? WHERE numero = ?";
+        String debitoSql = "UPDATE dados_conta SET saldo = saldo - ? WHERE numero = ?";
+
+        try(Connection con = Conexao.getConnection()) {
+            con.setAutoCommit(false);
+
+            try (
+                    PreparedStatement debito = con.prepareStatement(debitoSql);
+                    PreparedStatement credito = con.prepareStatement(creditoSql);
+                    ){
+                debito.setDouble(1, valor);
+                debito.setInt(2, origem);
+                debito.executeUpdate();
+
+                credito.setDouble(1, valor);
+                credito.setInt(2, destino);
+                credito.executeUpdate();
+
+                con.commit();
+
+                System.out.println("Transferencia realiza com sucesso!");
+
+            } catch (SQLException e) {
+                con.rollback();
+                System.err.println("Erro na transação. Rollback realizado!");
+                System.out.println("Erro: " + e.getMessage());
+
+            } finally {
+                con.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro na conexao: " + e.getMessage());
+        }
+    }
 }
