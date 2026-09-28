@@ -52,7 +52,7 @@ public class ContaDAO {
         return contas;
     }
 
-    public Conta buscarPorNumero(int numero) {
+    public Conta buscarConta(int numero) {
         String sql = "SELECT * FROM dados_conta WHERE numero = ?";
 
         try (
@@ -78,9 +78,7 @@ public class ContaDAO {
         return null;
     }
 
-    public void atualizarSaldo(
-            int numero,
-            double novoSaldo) {
+    public void atualizarSaldo(int numero, double novoSaldo) {
 
         String sql = "UPDATE dados_conta SET saldo = ? WHERE numero = ?";
 
@@ -132,8 +130,7 @@ public class ContaDAO {
                 debito.setInt(2, origem);
                 debito.executeUpdate();
 
-                // somente o valor da transferência
-                // entra na conta de destino
+                // somente o valor da transferência entra na conta de destino
                 credito.setDouble(1, valor);
                 credito.setInt(2, destino);
                 credito.executeUpdate();

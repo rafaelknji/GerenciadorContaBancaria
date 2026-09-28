@@ -63,7 +63,6 @@ public class Transferencia extends JDialog {
         add(painelBotoes, BorderLayout.SOUTH);
 
         btnTransferir.addActionListener(e -> transferir());
-
         btnCancelar.addActionListener(e -> dispose());
     }
 
@@ -71,7 +70,6 @@ public class Transferencia extends JDialog {
         try {
             int numeroOrigem = Integer.parseInt(txtNumeroOrigem.getText());
             int numeroDestino = Integer.parseInt(txtNumeroDestino.getText());
-
             double valor = Double.parseDouble(txtValor.getText().replace(",", "."));
 
             TarifaStrategy tarifa = (TarifaStrategy)comboTarifa.getSelectedItem();
@@ -96,6 +94,7 @@ public class Transferencia extends JDialog {
                 return;
             }
 
+
             boolean sucesso = contaService.transferir(numeroOrigem, numeroDestino, valor, tarifa);
 
             if (sucesso) {
@@ -109,8 +108,7 @@ public class Transferencia extends JDialog {
                 JOptionPane.showMessageDialog(
                         this,
                         "Não foi possível realizar a transferência.",
-                        "Erro",
-                        JOptionPane.ERROR_MESSAGE
+                        "Erro", JOptionPane.ERROR_MESSAGE
                 );
             }
 

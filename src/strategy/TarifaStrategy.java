@@ -4,7 +4,7 @@ public enum TarifaStrategy {
     FIXA {
         @Override
         public double calcularTarifa(double valor) {
-            return 10.0;
+            return 5.0;
         }
     },
 

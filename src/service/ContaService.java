@@ -3,6 +3,7 @@ package service;
 import connection.ContaDAO;
 import connection.TransferenciaDAO;
 import exception.SaldoInsuficienteException;
+import model.Conta;
 import model.ContaCorrente;
 import model.HistoricoTransferencia;
 import model.Transferencia;
@@ -70,18 +71,24 @@ public class ContaService {
     public boolean transferir(int origem, int destino, double valor, TarifaStrategy tarifaS) {
         double tarifa = tarifaS.calcularTarifa(valor);
 
-        boolean sucesso = contaDAO.transferir(origem, destino, valor, tarifa);
+        Conta contaOrigem = contaDAO.buscarConta(origem);
+        double saldo = contaOrigem.getSaldo();
 
-        if (sucesso) {
-            Transferencia t = new Transferencia(0, origem, destino, valor, tarifa, LocalDateTime.now());
+        if(saldo >= (valor + tarifa)) {
+            boolean sucesso = contaDAO.transferir(origem, destino, valor, tarifa);
 
-            transferenciaDAO.inserir(t);
+            if (sucesso) {
+                Transferencia t = new Transferencia(0, origem, destino, valor, tarifa, LocalDateTime.now());
+
+                transferenciaDAO.inserir(t);
+            }
+            return sucesso;
         }
-        return sucesso;
+        return false;
     }
 
-    public List<HistoricoTransferencia> getHistorico() {
-        return historico;
+    public List<Transferencia> getHistorico() {
+        return transferenciaDAO.listar();
     }
 
     public double calcularSaldoTotal(List<ContaCorrente> contas) {

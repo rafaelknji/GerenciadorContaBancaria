@@ -1,15 +1,17 @@
 package view;
 
-import model.HistoricoTransferencia;
+import connection.TransferenciaDAO;
 import service.ContaService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import model.Transferencia;
 
 public class Historico extends JDialog {
     private JTable tabela;
     private DefaultTableModel modeloTabela;
     private ContaService contaService;
+    private TransferenciaDAO transferenciaDAO;
 
     public Historico(JFrame pai, ContaService contaService) {
         super(pai, "Histórico de Transferências", true);
@@ -40,17 +42,16 @@ public class Historico extends JDialog {
         tabela.setRowHeight(30);
 
         painel.add(new JScrollPane(tabela), BorderLayout.CENTER);
-
         add(painel, BorderLayout.CENTER);
     }
 
     private void carregarHistorico() {
         modeloTabela.setRowCount(0);
 
-        for (HistoricoTransferencia transferencia : contaService.getHistorico()) {
+        for (Transferencia transferencia : contaService.getHistorico()) {
             modeloTabela.addRow(new Object[]{
-                            transferencia.getNumeroOrigem(),
-                            transferencia.getNumeroDestino(),
+                            transferencia.getOrigem(),
+                            transferencia.getDestino(),
                             String.format("R$ %.2f", transferencia.getValor()),
                             String.format("R$ %.2f", transferencia.getTarifa())
                     }
