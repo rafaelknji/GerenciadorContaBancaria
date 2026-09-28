@@ -1,18 +1,12 @@
 package model;
 
 public class HistoricoTransferencia {
-
     private int numeroOrigem;
     private int numeroDestino;
     private double valor;
     private double tarifa;
 
-    public HistoricoTransferencia(
-            int numeroOrigem,
-            int numeroDestino,
-            double valor,
-            double tarifa) {
-
+    public HistoricoTransferencia(int numeroOrigem, int numeroDestino, double valor, double tarifa) {
         this.numeroOrigem = numeroOrigem;
         this.numeroDestino = numeroDestino;
         this.valor = valor;
