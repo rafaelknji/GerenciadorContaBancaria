@@ -7,13 +7,10 @@ import java.util.List;
 
 public class TransferenciaDAO {
 
-    public void inserir(Transferencia transferencia) {
+    public void inserir(Connection con, Transferencia transferencia) {
         String sql = "INSERT INTO transferencia (origem, destino, valor, tarifa, data_hora) VALUES(?, ?, ?, ?, ?)";
 
-        try (
-                Connection con = Conexao.getConnection();
-                PreparedStatement stmt = con.prepareStatement(sql)
-                ){
+        try (PreparedStatement stmt = con.prepareStatement(sql)){
 
             stmt.setInt(1, transferencia.getOrigem());
             stmt.setInt(2, transferencia.getDestino());

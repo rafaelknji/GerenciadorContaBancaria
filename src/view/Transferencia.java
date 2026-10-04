@@ -1,11 +1,14 @@
 package view;
 
+import connection.ContaDAO;
+import model.Conta;
 import service.ContaService;
 import strategy.TarifaStrategy;
 import javax.swing.*;
 import java.awt.*;
 
 public class Transferencia extends JDialog {
+    private ContaDAO contaDAO = new ContaDAO();
     private JTextField txtNumeroOrigem;
     private JTextField txtNumeroDestino;
     private JTextField txtValor;
@@ -94,6 +97,17 @@ public class Transferencia extends JDialog {
                 return;
             }
 
+            Conta contaOrigem = contaService.buscarConta(numeroOrigem);
+            Conta contaDestino = contaService.buscarConta(numeroDestino);
+
+            if (contaOrigem == null || contaDestino == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Erro: Conta não encontrada",
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             boolean sucesso = contaService.transferir(numeroOrigem, numeroDestino, valor, tarifa);
 

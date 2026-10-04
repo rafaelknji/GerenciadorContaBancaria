@@ -5,7 +5,6 @@ import connection.TransferenciaDAO;
 import exception.SaldoInsuficienteException;
 import model.Conta;
 import model.ContaCorrente;
-import model.HistoricoTransferencia;
 import model.Transferencia;
 import strategy.TarifaStrategy;
 import java.io.IOException;
@@ -20,13 +19,11 @@ import java.util.stream.Collectors;
 
 public class ContaService {
     private List<ContaCorrente> contas;
-    private List<HistoricoTransferencia> historico;
     private ContaDAO contaDAO;
     private TransferenciaDAO transferenciaDAO;
 
     public ContaService() {
         contas = new ArrayList<>();
-        historico = new ArrayList<>();
         contaDAO = new ContaDAO();
         transferenciaDAO = new TransferenciaDAO();
 
@@ -70,20 +67,20 @@ public class ContaService {
 
     public boolean transferir(int origem, int destino, double valor, TarifaStrategy tarifaS) {
         double tarifa = tarifaS.calcularTarifa(valor);
-
         Conta contaOrigem = contaDAO.buscarConta(origem);
+        Conta contaDestino =  contaDAO.buscarConta(destino);
         double saldo = contaOrigem.getSaldo();
 
-        if(saldo >= (valor + tarifa)) {
-            boolean sucesso = contaDAO.transferir(origem, destino, valor, tarifa);
-
-            if (sucesso) {
-                Transferencia t = new Transferencia(0, origem, destino, valor, tarifa, LocalDateTime.now());
-
-                transferenciaDAO.inserir(t);
-            }
-            return sucesso;
+        if(contaOrigem == null || contaDestino == null) {
+            return false;
         }
+
+        if(saldo >= (valor + tarifa)) {
+            Transferencia t = new Transferencia(0, origem, destino, valor, tarifa, LocalDateTime.now());
+
+            return contaDAO.transferir(origem, destino, valor, tarifa, t);
+        }
+
         return false;
     }
 
@@ -184,5 +181,9 @@ public class ContaService {
             linhas.add(dados);
         }
         Files.write(Paths.get(caminho), linhas);
+    }
+
+    public Conta buscarConta(int numero) {
+        return contaDAO.buscarConta(numero);
     }
 }

@@ -2,11 +2,13 @@ package connection;
 
 import model.Conta;
 import model.ContaCorrente;
+import model.Transferencia;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContaDAO {
+    private TransferenciaDAO transferenciaDAO = new TransferenciaDAO();
 
     public void inserir(Conta conta) {
         String sql = "INSERT INTO dados_conta (numero, titular, saldo) VALUES (?, ?, ?)";
@@ -79,7 +81,6 @@ public class ContaDAO {
     }
 
     public void atualizarSaldo(int numero, double novoSaldo) {
-
         String sql = "UPDATE dados_conta SET saldo = ? WHERE numero = ?";
 
         try (
@@ -113,7 +114,7 @@ public class ContaDAO {
         }
     }
 
-    public boolean transferir(int origem, int destino, double valor, double tarifa) {
+    public boolean transferir(int origem, int destino, double valor, double tarifa, Transferencia transferencia) {
         String creditoSql = "UPDATE dados_conta SET saldo = saldo + ? WHERE numero = ?";
         String debitoSql = "UPDATE dados_conta SET saldo = saldo - ? WHERE numero = ?";
 
@@ -134,6 +135,9 @@ public class ContaDAO {
                 credito.setDouble(1, valor);
                 credito.setInt(2, destino);
                 credito.executeUpdate();
+
+                // salva os dados de transferência no historico(transferenciaDAO)
+                transferenciaDAO.inserir(con, transferencia);
 
                 con.commit();
 
